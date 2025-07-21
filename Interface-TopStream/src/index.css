@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+/* Esconde a scrollbar sem desativar o scroll */
+.scroll-invisivel {
+  scrollbar-width: none; /* Firefox */
+}
+.scroll-invisivel::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.passador .controle {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.passador:hover .controle {
+  opacity: 1;
+}
