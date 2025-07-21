@@ -1,4 +1,5 @@
-import teste from '../assets/teste.jpg'
+import teste from '../assets/teste.jpg';
+
 const CardConteudo = ({ imagemFundo }) => {
   return (
     <div

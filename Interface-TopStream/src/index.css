@@ -16,3 +16,9 @@
 .passador:hover .controle {
   opacity: 1;
 }
+
+html, body {
+  background-color: #030712; /* Tailwind bg-gray-950 */
+  scrollbar-gutter: stable;
+}
+

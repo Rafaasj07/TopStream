@@ -117,7 +117,7 @@ const CardSection = ({ nomeSecao }) => {
         // `w-full`: Ocupa 100% da largura.
         // `h-96`: Altura fixa.
         // `px-4`: Adiciona padding nas laterais esquerda e direita, criando a "moldura" da seção.
-        <div className="w-full lg:h-60 h-52 px-3 lg:px-10">
+        <div className="w-full lg:h-60 h-52 px-3 lg:pl-10 pr-6">
             {/* Título da seção. */}
             <h1 className="text-white text-2xl font-bold py-4">{nomeSecao}</h1>
 
@@ -129,14 +129,14 @@ const CardSection = ({ nomeSecao }) => {
                 {/* Renderiza o botão esquerdo APENAS se `showLeft` for `true`. */}
                 {showLeft && (
                     <button onClick={pageLeft} className="controle absolute left-0 h-full top-0 z-10 items-center px-4 text-white hover:bg-gradient-to-r from-black/60 to-transparent transition-colors duration-300 hidden md:flex" aria-label="Scroll Left">
-                        <span className="text-2xl font-bold">←</span>
+                        <i className='bx bx-chevron-left text-4xl text-white'></i>
                     </button>
                 )}
 
                 {/* Renderiza o botão direito APENAS se `showRight` for `true`. */}
                 {showRight && (
                     <button onClick={pageRight} className="controle absolute right-0 h-full top-0 z-10 items-center px-4 text-white hover:bg-gradient-to-l from-black/60 to-transparent transition-colors duration-300 hidden md:flex" aria-label="Scroll Right">
-                        <span className="text-2xl font-bold">→</span>
+                        <i className='bx bx-chevron-right text-4xl text-white'></i>
                     </button>
                 )}
 
