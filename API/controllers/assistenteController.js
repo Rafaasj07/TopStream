@@ -1,7 +1,7 @@
 // controllers/assistenteController.js
 import * as assistenteService from '../services/assistenteService.js';
 import * as tmdbService from '../services/tmdbService.js';
-import * as jikanService from '../services/jikanService.js';
+import * as anilistService from '../services/anilistService.js';
 
 export async function obterSugestaoUnica(req, res) {
   // Pega a descrição do corpo da requisição POST
@@ -32,8 +32,8 @@ export async function obterSugestaoUnica(req, res) {
         resultados = await tmdbService.buscarSeriesPorTitulo(termo_busca);
         break;
       case 'anime':
-        // Você pode usar o Jikan ou o TMDB, dependendo da sua preferência
-        resultados = await jikanService.buscarAnimesPorTitulo(termo_busca);
+        // Agora usando o anilistService
+        resultados = await anilistService.buscarAnimesPorTitulo(termo_busca);
         break;
       default:
         return res.status(400).json({ erro: 'Tipo de conteúdo inválido retornado pela IA.' });

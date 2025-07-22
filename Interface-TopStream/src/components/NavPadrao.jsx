@@ -87,7 +87,7 @@ const NavPadrao = () => {
 
             {/* Menu dropdown para mobile (expande/contrai com animação) */}
             <div
-                className={`absolute top-24 left-0 w-full bg-gray-950 flex flex-col items-center gap-4 overflow-hidden transition-all duration-300 ease-in-out md:hidden z-50
+                className={`absolute top-20 left-0 w-full bg-gray-950 flex flex-col items-center gap-4 overflow-hidden transition-all duration-300 ease-in-out md:hidden z-50
           ${isMenuOpen ? 'max-h-[500px] py-4 opacity-100' : 'max-h-0 py-0 opacity-0'}`}
             >
                 <button onClick={() => handleNav('/Home')} className="text-white text-lg w-full py-2 hover:bg-gray-800">Início</button>

@@ -1,13 +1,19 @@
-import teste from '../assets/teste.jpg';
+// Interface-TopStream/src/components/CardConteudo.jsx
 
-const CardConteudo = ({ imagemFundo }) => {
-  return (
-    <div
-      className="lg:w-32 lg:h-40 w-28 h-36 bg-center bg-cover rounded-md"
-      style={{ backgroundImage: `url(${teste})` }}
-    >
-    </div>
-  );
+const CardConteudo = ({ titulo, imagem }) => {
+    return (
+        // ✅ A CORREÇÃO: Adicionamos a classe `h-full`.
+        // Agora, este contêiner ocupará toda a altura disponível no carrossel.
+        <div className="lg:w-40 w-32 flex-shrink-0 h-full">
+            <img
+                src={imagem}
+                alt={`Pôster de ${titulo}`}
+                // A imagem (com h-full) agora preencherá este contêiner de tamanho correto,
+                // sem vazar ou criar rolagem vertical.
+                className="w-full h-full object-cover rounded-lg shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
+            />
+        </div>
+    );
 };
 
 export default CardConteudo;

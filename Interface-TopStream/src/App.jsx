@@ -18,7 +18,7 @@ function App() {
     <BrowserRouter>
       {/* Define a área onde as rotas serão renderizadas. */}
       <Routes>
-        {/* Define cada rota e o componente correspondente. */}
+        {/* Define cada rota e o componenteAVA correspondente. */}
         <Route path="/Home" element={<Home />} />
         <Route path="/Filmes" element={<Filmes />} />
         <Route path="/Series" element={<Series />} />

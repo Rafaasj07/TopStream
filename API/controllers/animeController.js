@@ -1,8 +1,8 @@
-import * as jikanService from '../services/jikanService.js';
+import * as anilistService from '../services/anilistService.js';
 
 export async function listarTopAnimes(req, res) {
   try {
-    const animes = await jikanService.buscarTopAnimes();
+    const animes = await anilistService.buscarTopAnimes();
     res.json(animes);
   } catch (erro) {
     res.status(500).json({ erro: erro.message });
@@ -10,10 +10,10 @@ export async function listarTopAnimes(req, res) {
 }
 
 export async function listarAnimesPorGenero(req, res) {
-  const { id } = req.params;
+  const { id } = req.params; // O 'id' aqui será o nome do gênero, ex: "Action"
   try {
-    const series = await buscarAnimesPorGenero(id);
-    res.json(series);
+    const animes = await anilistService.buscarAnimesPorGenero(id);
+    res.json(animes);
   } catch (erro) {
     res.status(500).json({ erro: erro.message });
   }
@@ -22,7 +22,7 @@ export async function listarAnimesPorGenero(req, res) {
 export async function detalhesDoAnime(req, res) {
   const { id } = req.params;
   try {
-    const detalhes = await buscarDetalhesAnime(id);
+    const detalhes = await anilistService.buscarDetalhesAnime(id);
     res.json(detalhes);
   } catch (erro) {
     res.status(500).json({ erro: erro.message });
@@ -34,10 +34,9 @@ export async function pesquisarAnime(req, res) {
   if (!query) return res.status(400).json({ erro: 'Parâmetro "query" é obrigatório.' });
 
   try {
-    const series = await buscarAnimesPorTitulo(query);
-    res.json(series);
+    const animes = await anilistService.buscarAnimesPorTitulo(query);
+    res.json(animes);
   } catch (erro) {
     res.status(500).json({ erro: erro.message });
   }
 }
-
