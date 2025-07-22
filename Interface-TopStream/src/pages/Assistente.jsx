@@ -1,62 +1,74 @@
 import { useState } from "react";
 import NavPadrao from "../components/NavPadrao";
 import CardSuguestao from "../components/CardSuguestao";
-import { obterSugestao } from "../services/assistenteService"; // Importando a função da API
+import { obterSugestao } from "../services/assistenteService"; // Importa a função da API.
+import DetalhesModal from "../components/DetalhesModal"; // Importa o componente do Modal.
 
+// Página do Assistente, que usa IA para encontrar um conteúdo a partir de uma descrição.
 const Assistente = () => {
-    // --- ESTADOS DO COMPONENTE ---
+    // Estados para gerenciar a entrada do usuário, o resultado, o carregamento e o modal.
     const [input, setInput] = useState("");
-    const [resultado, setResultado] = useState(null); // Guarda o resultado da API
+    const [resultado, setResultado] = useState(null);
     const [carregando, setCarregando] = useState(false);
     const [buscaRealizada, setBuscaRealizada] = useState(false);
-    const [erro, setErro] = useState(null); // Guarda a mensagem de erro para o usuário
+    const [erro, setErro] = useState(null);
+    const [itemModal, setItemModal] = useState(null);
+    const [tipoConteudo, setTipoConteudo] = useState(null);
 
-    // --- FUNÇÃO CHAMADA AO ENVIAR O FORMULÁRIO ---
+    // Funções para controlar a exibição do modal de detalhes.
+    const abrirModal = (item) => setItemModal(item);
+    const fecharModal = () => setItemModal(null);
+
+    // Lida com o envio do formulário, chamando a API do assistente.
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!input.trim()) return;
 
-        // 1. Prepara para a nova busca
         setCarregando(true);
         setBuscaRealizada(true);
         setResultado(null);
-        setErro(null); // Limpa erros anteriores
+        setItemModal(null);
+        setErro(null);
 
         try {
-            // 2. Chama a função do serviço que busca na API real
             const sugestaoDaApi = await obterSugestao(input);
 
-            // 3. Verifica se a API retornou um resultado válido
-            if (sugestaoDaApi && sugestaoDaApi.poster_path) {
-                // Formata o resultado para o que o CardSuguestao espera
-                const dadosFormatados = {
-                    // O título pode vir como 'title' (filme/TMDB) ou 'name' (série/TMDB)
-                    titulo: sugestaoDaApi.title || sugestaoDaApi.name,
-                    // A imagem precisa do caminho base da API do TMDB
-                    imagem: `https://image.tmdb.org/t/p/w500${sugestaoDaApi.poster_path}`,
-                };
-                setResultado(dadosFormatados);
+            if (sugestaoDaApi && sugestaoDaApi.id) {
+                // Determina o tipo de conteúdo com base nas chaves do objeto retornado.
+                if (sugestaoDaApi.first_air_date) {
+                    setTipoConteudo('serie');
+                } else if (sugestaoDaApi.release_date) {
+                    setTipoConteudo('filme');
+                } else {
+                    setTipoConteudo('anime');
+                }
+                setResultado(sugestaoDaApi);
             } else {
-                // Se a API não retornou um pôster, consideramos que não houve um bom resultado
                 throw new Error("Não foi possível encontrar uma sugestão correspondente.");
             }
 
         } catch (error) {
-            // 4. Trata os erros da API de forma amigável
-            console.error("Erro detalhado:", error); // Log para o desenvolvedor
+            console.error("Erro detalhado:", error);
             setErro("Desculpe, não encontramos nada. Tente descrever de outra forma.");
         } finally {
-            // 5. Finaliza o carregamento, ocorrendo erro ou não
             setCarregando(false);
         }
     };
 
+    // Constrói a URL da imagem, tratando fontes diferentes (TMDB/AniList).
+    const getImagemUrl = (path) => {
+        if (!path) return '';
+        if (path.startsWith("http")) return path;
+        return `https://image.tmdb.org/t/p/w500${path}`;
+    };
+
+    // Renderização da página.
     return (
         <div className="bg-gray-950 min-h-screen text-white">
             <NavPadrao />
 
             <main className="w-full max-w-4xl pt-24 mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-                {/* Cabeçalho e formulário (sem alterações) */}
+                {/* Cabeçalho e formulário de busca. */}
                 <div className="flex flex-col items-center justify-center gap-3 text-center mb-8">
                     <i className="bx bxs-bot text-5xl text-indigo-400" />
                     <h1 className="text-white text-3xl sm:text-4xl font-bold">
@@ -88,17 +100,19 @@ const Assistente = () => {
                     </button>
                 </form>
 
-                {/* Seção de Resultados Melhorada */}
+                {/* Seção que exibe o resultado da busca ou uma mensagem de erro. */}
                 <section className="mt-16">
                     {buscaRealizada && !carregando && (
                         <>
                             {resultado ? (
-                                // Se 'resultado' tem um objeto, renderiza o card com os dados da API
                                 <div className="flex justify-center">
-                                    <CardSuguestao titulo={resultado.titulo} imagem={resultado.imagem} />
+                                    <CardSuguestao
+                                        titulo={resultado.title || resultado.name}
+                                        imagem={getImagemUrl(resultado.poster_path)}
+                                        onClick={() => abrirModal(resultado)}
+                                    />
                                 </div>
                             ) : (
-                                // Se 'resultado' for null, mostra a mensagem de erro (se houver) ou a padrão
                                 <div className="text-center">
                                     <p className="text-gray-400 text-lg">
                                         {erro || "Nenhum resultado encontrado para sua busca."}
@@ -109,6 +123,15 @@ const Assistente = () => {
                     )}
                 </section>
             </main>
+
+            {/* Renderiza o modal de detalhes se um item for selecionado. */}
+            {itemModal && (
+                <DetalhesModal
+                    item={itemModal}
+                    tipo={tipoConteudo}
+                    onClose={fecharModal}
+                />
+            )}
         </div>
     );
 };

@@ -3,6 +3,13 @@ import * as assistenteService from '../services/assistenteService.js';
 import * as tmdbService from '../services/tmdbService.js';
 import * as anilistService from '../services/anilistService.js';
 
+/**
+ * Processa uma descrição de texto para sugerir um único filme, série ou anime.
+ * Esta função recebe uma descrição textual, usa um serviço de IA para
+ * analisar e extrair o tipo de mídia e o termo de busca, e então
+- * busca no serviço correspondente (TMDB para filmes/séries, Anilist para animes)
+ * para retornar o resultado mais relevante.
+ */
 export async function obterSugestaoUnica(req, res) {
   // Pega a descrição do corpo da requisição POST
   const { descricao } = req.body;

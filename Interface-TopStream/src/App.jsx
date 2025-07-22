@@ -10,6 +10,7 @@ import Series from './pages/Series';
 import Animes from './pages/Animes';
 import Assistente from './pages/Assistente';
 import Pesquisar from './pages/Pesquisar';
+import ResultadoBusca from './pages/ResultadoBusca';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/Animes" element={<Animes />} />
         <Route path="/Assistente" element={<Assistente />} />
         <Route path="/Pesquisar" element={<Pesquisar />} />
+        <Route path="/busca/:query" element={<ResultadoBusca />} />
         {/* Redireciona para /Home caso a rota não exista */}
         <Route path="*" element={<Navigate to="/Home" />} />
       </Routes>

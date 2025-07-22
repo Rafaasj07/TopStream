@@ -1,26 +1,29 @@
 import { useRef, useState, useEffect } from "react";
 import CardConteudo from "./CardConteudo";
+import DetalhesModal from "./DetalhesModal";
 
-const CardSection = ({ nomeSecao, fetchFunction, fetchParams = [] }) => {
+// Componente reutilizável que exibe uma seção de cards em um carrossel.
+const CardSection = ({ nomeSecao, fetchFunction, fetchParams = [], dados, tipo }) => {
+    // Estados para gerenciar o conteúdo, carregamento, erros e o modal.
     const [conteudo, setConteudo] = useState([]);
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState(null);
+    const [itemModal, setItemModal] = useState(null);
 
+    // Referências e estados para controlar o carrossel.
     const scrollRef = useRef(null);
     const [showLeft, setShowLeft] = useState(false);
     const [showRight, setShowRight] = useState(true);
 
+    // Efeito para buscar ou receber os dados da seção.
     useEffect(() => {
         const buscarDados = async () => {
-            if (!fetchFunction) {
-                setCarregando(false);
-                return;
-            }
+            if (!fetchFunction) return;
             try {
                 setCarregando(true);
                 setErro(null);
-                const dados = await fetchFunction(...fetchParams);
-                setConteudo(dados);
+                const dadosApi = await fetchFunction(...fetchParams);
+                setConteudo(dadosApi);
             } catch (err) {
                 console.error(`Erro ao buscar dados para a seção "${nomeSecao}":`, err);
                 setErro("Não foi possível carregar o conteúdo.");
@@ -28,9 +31,17 @@ const CardSection = ({ nomeSecao, fetchFunction, fetchParams = [] }) => {
                 setCarregando(false);
             }
         };
-        buscarDados();
-    }, [fetchFunction, nomeSecao, JSON.stringify(fetchParams)]); // Adicionado stringify para estabilidade
 
+        if (fetchFunction) {
+            buscarDados();
+        } else if (dados) {
+            setConteudo(dados);
+            setCarregando(false);
+            setErro(null);
+        }
+    }, [fetchFunction, nomeSecao, JSON.stringify(fetchParams), dados]);
+
+    // --- LÓGICA DO CARROSSEL ---
     const scrollCarrossel = (distancia) => {
         if (!scrollRef.current) return;
         const firstCard = scrollRef.current.querySelector('.flex > *');
@@ -44,40 +55,42 @@ const CardSection = ({ nomeSecao, fetchFunction, fetchParams = [] }) => {
     const handleScroll = () => {
         if (!scrollRef.current) return;
         const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-        setShowLeft(scrollLeft > 1);
-        setShowRight(scrollLeft < scrollWidth - clientWidth - 1);
+        const threshold = 5;
+        setShowLeft(scrollLeft > threshold);
+        setShowRight(scrollLeft < scrollWidth - clientWidth - threshold);
     };
-    
+
     useEffect(() => {
         const scrollContainer = scrollRef.current;
         if (!scrollContainer || conteudo.length === 0) return;
+        
+        setTimeout(() => {
+            handleScroll();
+        }, 100);
 
-        handleScroll(); // Verifica o estado inicial
         scrollContainer.addEventListener("scroll", handleScroll);
         window.addEventListener('resize', handleScroll);
-        
         return () => {
-            if (scrollContainer) {
-                scrollContainer.removeEventListener("scroll", handleScroll);
-            }
+            if (scrollContainer) scrollContainer.removeEventListener("scroll", handleScroll);
             window.removeEventListener('resize', handleScroll);
         };
     }, [conteudo]);
 
-    // Função para formatar a URL da imagem
+    // --- LÓGICA DO MODAL ---
+    const abrirModal = (item) => setItemModal(item);
+    const fecharModal = () => setItemModal(null);
+    const handleClick = (item) => abrirModal(item);
+
+    // --- FUNÇÕES AUXILIARES E RENDERIZAÇÃO ---
     const getImagemUrl = (path) => {
-        if (!path) return 'URL_DA_IMAGEM_PADRAO'; // URL de uma imagem placeholder
-        // Se o path já for uma URL completa (começa com http), use-o diretamente.
-        if (path.startsWith('http')) {
-            return path;
-        }
-        // Caso contrário, adicione o prefixo da TMDB.
+        if (!path) return '';
+        if (path.startsWith('http')) return path;
         return `https://image.tmdb.org/t/p/w500${path}`;
     };
 
     if (carregando) {
         return (
-            <div className="w-full px-3 lg:pl-10 pr-6 mb-8">
+            <div className="w-full pl-3 lg:pl-10 mb-8">
                 <h1 className="text-white text-2xl font-bold mb-4">{nomeSecao}</h1>
                 <div className="lg:h-52 md:h-48 h-44 bg-gray-900 rounded-lg flex items-center justify-center">
                     <p className="text-gray-500">Carregando...</p>
@@ -85,38 +98,56 @@ const CardSection = ({ nomeSecao, fetchFunction, fetchParams = [] }) => {
             </div>
         );
     }
-    
+
     if (erro || !conteudo || conteudo.length === 0) {
+        if (erro) return <p className="text-red-500 pl-3 lg:pl-10">{erro}</p>;
         return null;
     }
 
     return (
-        <div className="w-full px-3 lg:pl-10 pr-6 ">
-            <h1 className="text-white text-2xl font-bold mb-4">{nomeSecao}</h1>
-            <div className="relative passador group lg:h-52 md:h-48 h-44">
-                {showLeft && (
-                    <button onClick={() => scrollCarrossel(-5)} className="controle absolute left-0 h-full top-0 z-10 items-center px-4 text-white hover:bg-gradient-to-r from-black/60 to-transparent transition-colors duration-300 hidden md:flex" aria-label="Scroll Left">
-                        <i className='bx bx-chevron-left text-4xl text-white'></i>
-                    </button>
-                )}
-                {showRight && (
-                    <button onClick={() => scrollCarrossel(5)} className="controle absolute right-0 h-full top-0 z-10 items-center px-4 text-white hover:bg-gradient-to-l from-black/60 to-transparent transition-colors duration-300 hidden md:flex" aria-label="Scroll Right">
-                        <i className='bx bx-chevron-right text-4xl text-white'></i>
-                    </button>
-                )}
-                <div ref={scrollRef} className="overflow-x-auto scroll-invisivel h-full">
-                    <div className="flex gap-[10px] w-max h-full items-center">
-                        {conteudo.map((item, index) => (
-                            <CardConteudo
-                                key={`${item.id}-${index}`}
-                                titulo={item.title || item.name}
-                                imagem={getImagemUrl(item.poster_path)}
-                            />
-                        ))}
+        <>
+            <div className="w-full pl-3 lg:pl-10 mb-8">
+                <h1 className="text-white text-2xl font-bold mb-4">{nomeSecao}</h1>
+                <div className={`relative passador group lg:h-52 md:h-48 h-44 
+                    ${showLeft ? 'before:content-[""] before:absolute before:inset-y-0 before:left-0 before:w-16 before:bg-gradient-to-r before:from-gray-950 before:to-transparent before:z-20' : ''}
+                    ${showRight ? 'after:content-[""] after:absolute after:inset-y-0 after:right-0 after:w-16 after:bg-gradient-to-l after:from-gray-950 after:to-transparent after:z-20' : ''}`}
+                >
+                    {/* Botões de rolagem do carrossel */}
+                    {showLeft && (
+                        <button onClick={() => scrollCarrossel(-5)} className="controle absolute left-0 h-full top-0 z-30 items-center px-4 text-white hover:bg-gradient-to-r from-black/60 to-transparent transition-colors duration-300 hidden md:flex" aria-label="Scroll Left">
+                            <i className='bx bx-chevron-left text-4xl text-white'></i>
+                        </button>
+                    )}
+                    {showRight && (
+                        <button onClick={() => scrollCarrossel(5)} className="controle absolute right-0 h-full top-0 z-30 items-center px-4 text-white hover:bg-gradient-to-l from-black/60 to-transparent transition-colors duration-300 hidden md:flex" aria-label="Scroll Right">
+                            <i className='bx bx-chevron-right text-4xl text-white'></i>
+                        </button>
+                    )}
+                    {/* Container dos cards com rolagem horizontal */}
+                    <div ref={scrollRef} className="overflow-x-auto scroll-invisivel h-full">
+                        <div className="flex gap-[10px] w-max h-full items-center pr-3 lg:pr-10">
+                            {conteudo.map((item, index) => (
+                                <CardConteudo
+                                    key={`${item.id}-${index}`}
+                                    titulo={item.title || item.name}
+                                    imagem={getImagemUrl(item.poster_path)}
+                                    onClick={() => handleClick(item)}
+                                />
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            {/* Renderiza o modal se um item for selecionado */}
+            {itemModal && (
+                <DetalhesModal
+                    item={itemModal}
+                    tipo={tipo}
+                    onClose={fecharModal}
+                />
+            )}
+        </>
     );
 };
 

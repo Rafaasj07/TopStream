@@ -23,3 +23,4 @@ export const pesquisarFilmes = async (query) => {
     const response = await api.get('/filmes/pesquisar', { params: { query } });
     return response.data;
 };
+

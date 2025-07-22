@@ -23,3 +23,4 @@ export const pesquisarSeries = async (query) => {
     const response = await api.get('/series/pesquisar', { params: { query } });
     return response.data;
 };
+

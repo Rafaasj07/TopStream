@@ -1,5 +1,6 @@
 import * as anilistService from '../services/anilistService.js';
 
+// Função para buscar os animes mais populares.
 export async function listarTopAnimes(req, res) {
   try {
     const animes = await anilistService.buscarTopAnimes();
@@ -9,6 +10,7 @@ export async function listarTopAnimes(req, res) {
   }
 }
 
+// Função para buscar animes filtrando por gênero.
 export async function listarAnimesPorGenero(req, res) {
   const { id } = req.params; // O 'id' aqui será o nome do gênero, ex: "Action"
   try {
@@ -19,6 +21,7 @@ export async function listarAnimesPorGenero(req, res) {
   }
 }
 
+// Função para obter os detalhes de um anime específico pelo ID.
 export async function detalhesDoAnime(req, res) {
   const { id } = req.params;
   try {
@@ -29,6 +32,7 @@ export async function detalhesDoAnime(req, res) {
   }
 }
 
+// Função para pesquisar animes com base em um título.
 export async function pesquisarAnime(req, res) {
   const { query } = req.query;
   if (!query) return res.status(400).json({ erro: 'Parâmetro "query" é obrigatório.' });

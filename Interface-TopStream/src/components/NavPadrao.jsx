@@ -9,6 +9,9 @@ const NavPadrao = () => {
     // Estado para mostrar ou esconder o campo de pesquisa (input)
     const [mostrarInput, setMostrarInput] = useState(false);
 
+    // Estado para o termo de busca
+    const [termoBusca, setTermoBusca] = useState('');
+
     // Hook para navegação entre páginas
     const navegar = useNavigate();
 
@@ -18,8 +21,16 @@ const NavPadrao = () => {
         setTimeout(() => navegar(path), 400);
     };
 
+    const handleSearch = (e) => {
+        // Verifica se a tecla pressionada foi 'Enter' e se o campo não está vazio
+        if (e.key === 'Enter' && termoBusca.trim() !== '') {
+            navegar(`/busca/${termoBusca.trim()}`);
+            setTermoBusca(''); // Limpa o input após a busca
+        }
+    };
+
     return (
-        <nav className="fixed top-0 left-0 z-50 h-20 sm:h-20 md:h-20 lg:h-24 w-full bg-gray-950 flex items-center justify-between lg:pr-1 lg:pl-13 pr-4 pl-5 mb-5">
+        <nav className="fixed top-0 left-0 z-50 h-20 sm:h-20 md:h-20 lg:h-24 w-full bg-gray-950 flex items-center justify-between lg:pr-1 lg:pl-10 pr-4 pl-3 mb-5">
             {/* Seção da logo + links de navegação (visíveis apenas em telas médias ou maiores) */}
             <div className="flex items-center gap-6">
                 {/* Botão da logo que leva para a Home */}
@@ -56,9 +67,12 @@ const NavPadrao = () => {
                         type="text"
                         autoComplete="off"
                         placeholder="Pesquisar..."
+                        value={termoBusca}
+                        onChange={(e) => setTermoBusca(e.target.value)}
+                        onKeyDown={handleSearch} // Adiciona o evento de teclado
                         className={`ml-2 px-3 py-1 rounded-3xl bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 overflow-hidden whitespace-nowrap
-              transition-all duration-500 ease-in-out transform origin-right
-              ${mostrarInput ? 'w-[300px] opacity-100' : 'w-0 opacity-0'}`}
+                        transition-all duration-500 ease-in-out transform origin-right
+                        ${mostrarInput ? 'w-[300px] opacity-100' : 'w-0 opacity-0'}`}
                     />
                 </div>
 

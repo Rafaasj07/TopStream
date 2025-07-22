@@ -1,51 +1,44 @@
-// Em uma página como `pages/Home.jsx`
-
 import CardSection from "../components/CardSection";
 import NavPadrao from "../components/NavPadrao";
 
-// Importe TODAS as funções de busca que você vai precisar
+// Importa as funções de busca de diferentes serviços.
 import { buscarTopFilmes } from "../services/filmeService";
 import { buscarTopSeries, buscarSeriesPorGenero } from "../services/serieService";
 import { buscarTopAnimes } from "../services/animeService";
 
+// Componente da página principal (Home) da aplicação.
 const Home = () => {
     return (
         <div className="bg-gray-950 min-h-screen">
             <NavPadrao />
 
+            {/* O conteúdo principal organiza as diferentes seções de conteúdo. */}
             <main className="flex flex-col gap-8 pb-8 pt-26">
-                {/* Exemplo 1: Top 10 Filmes */}
+                
                 <CardSection
                     nomeSecao="Top 10 Filmes"
                     fetchFunction={buscarTopFilmes}
+                    tipo="filme"
                 />
-
-                {/* Exemplo 2: Top 10 Séries */}
+                
                 <CardSection
                     nomeSecao="Top 10 Séries"
                     fetchFunction={buscarTopSeries}
+                    tipo="serie"
                 />
                 
-                {/* Exemplo 3: Top 10 Animes */}
                 <CardSection
                     nomeSecao="Top 10 Animes"
                     fetchFunction={buscarTopAnimes}
+                    tipo="anime"
                 />
                 
-                {/* Exemplo 4: Séries de Ação (ID do gênero: 10759) */}
                 <CardSection
                     nomeSecao="Séries de Ação e Aventura"
                     fetchFunction={buscarSeriesPorGenero}
-                    fetchParams={[10759]} // Passa o ID do gênero como parâmetro
+                    fetchParams={[10759]} // Passa o ID do gênero como parâmetro.
+                    tipo="serie"
                 />
-
-                 {/* Exemplo 5: Filmes de Comédia (ID do gênero: 35)
-                 // Supondo que você crie a função buscarFilmesPorGenero no seu filmeService.js
-                 <CardSection
-                    nomeSecao="Filmes de Comédia"
-                    fetchFunction={buscarFilmesPorGenero}
-                    fetchParams={[35]} 
-                /> */}
             </main>
         </div>
     );
