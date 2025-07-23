@@ -95,7 +95,7 @@ const ResultadoBusca = () => {
                         promises.push(pesquisarAnimes(query));
                     }
                     const [resFilmes, resSeries, resAnimes] = await Promise.all(promises);
-                    
+
                     if (filter === 'filmes') filmesResult = resFilmes;
                     else if (filter === 'series') seriesResult = resFilmes;
                     else if (filter === 'animes') animesResult = resFilmes;
@@ -134,10 +134,10 @@ const ResultadoBusca = () => {
                         {filmes.length > 0 && <CardSection nomeSecao="Filmes Encontrados" dados={filmes} tipo="filme" />}
                         {series.length > 0 && <CardSection nomeSecao="Séries Encontradas" dados={series} tipo="serie" />}
                         {animes.length > 0 && <CardSection nomeSecao="Animes Encontrados" dados={animes} tipo="anime" />}
-                        
+
                         {/* Mensagem exibida se nenhuma categoria tiver resultados. */}
                         {!carregando && !filmes.length && !series.length && !animes.length && (
-                            <p className="text-gray-400 text-lg">Nenhum resultado encontrado para sua busca.</p>
+                            <p className="text-gray-400 text-lg pl-3">Nenhum resultado encontrado para sua busca.</p>
                         )}
                     </>
                 )}

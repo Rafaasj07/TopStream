@@ -1,181 +1,152 @@
-// services/anilistService.js
 import axios from 'axios';
+import { traduzirTexto } from './traducaoService.js';
 
-// URL base para a API GraphQL da AniList.
+// URL base da API GraphQL da AniList
 const ANILIST_API_URL = 'https://graphql.anilist.co';
 
 /**
- * Função genérica para fazer chamadas à API AniList.
- * @param {string} query - A query GraphQL.
- * @param {object} variables - As variáveis para a query.
- * @returns {Promise<object>} - Os dados da resposta da API.
+ * Função genérica que faz requisição GraphQL para a AniList
+ * @param {string} query - A query GraphQL a ser enviada
+ * @param {object} variables - Variáveis da query
+ * @returns {Promise<object>} - Dados da resposta
  */
 async function buscarNaAniList(query, variables) {
   try {
-    // Realiza uma requisição POST para a API com a query e as variáveis.
-    const response = await axios.post(
-      ANILIST_API_URL,
-      {
-        query,
-        variables,
+    const response = await axios.post(ANILIST_API_URL, {
+      query,
+      variables,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      }
-    );
-    // Retorna os dados da resposta.
+    });
     return response.data;
   } catch (error) {
-    console.error(`Erro ao acessar AniList API:`, error.message);
-    throw new Error('Erro ao buscar dados da API de animes.');
+    console.error('Erro ao acessar AniList API:', error.response ? error.response.data : error.message);
+    throw new Error('Não foi possível buscar dados da AniList.');
   }
 }
 
 /**
- * Busca os 10 animes mais populares.
- * @returns {Promise<Array>} Uma lista com os 10 animes mais populares.
+ * Busca os 10 animes mais populares, excluindo conteúdo adulto
+ * @returns {Promise<Array>} - Lista de animes
  */
 export async function buscarTopAnimes() {
-  // Define a query GraphQL para buscar o top 10 animes por popularidade.
   const query = `
-    query {
-      Page(page: 1, perPage: 10) {
-        media(type: ANIME, sort: POPULARITY_DESC) {
-          id
-          title {
-            romaji
-            english
-          }
-          coverImage {
-            large
+      query {
+        Page(page: 1, perPage: 10) {
+          media(type: ANIME, sort: POPULARITY_DESC, isAdult: false) {
+            id
+            title { romaji english }
+            coverImage { large }
           }
         }
       }
-    }
-  `;
-  // Executa a busca na API.
+    `;
   const response = await buscarNaAniList(query);
-  // Mapeia a resposta para um formato de objeto mais simples e padronizado.
   return response.data.Page.media.map(anime => ({
     id: anime.id,
-    title: anime.title.romaji,
+    title: anime.title.romaji || anime.title.english,
     name: anime.title.english || anime.title.romaji,
     poster_path: anime.coverImage.large
   }));
 }
 
 /**
- * Busca animes por gênero.
- * @param {string} genre - O nome do gênero de anime a ser buscado.
- * @returns {Promise<Array>} Uma lista de animes que correspondem ao gênero.
+ * Busca animes por gênero, excluindo conteúdo adulto
+ * @param {string} genre - Gênero a ser buscado
+ * @returns {Promise<Array>} - Lista de animes do gênero
  */
 export async function buscarAnimesPorGenero(genre) {
-    // Define a query GraphQL que aceita uma variável 'genre'.
-    const query = `
+  const query = `
       query ($genre: String) {
         Page(page: 1, perPage: 24) {
-          media(type: ANIME, genre: $genre, sort: POPULARITY_DESC) {
+          media(type: ANIME, genre: $genre, sort: POPULARITY_DESC, isAdult: false) {
             id
-            title {
-              romaji
-              english
-            }
-            coverImage {
-              large
-            }
+            title { romaji english }
+            coverImage { large }
           }
         }
       }
     `;
-    const variables = { genre };
-    // Executa a busca passando o gênero como variável.
-    const response = await buscarNaAniList(query, variables);
-    // Mapeia a resposta para o formato padronizado.
-    return response.data.Page.media.map(anime => ({
-        id: anime.id,
-        title: anime.title.romaji,
-        name: anime.title.english || anime.title.romaji,
-        poster_path: anime.coverImage.large
-      }));
+  const variables = { genre };
+  const response = await buscarNaAniList(query, variables);
+  return response.data.Page.media.map(anime => ({
+    id: anime.id,
+    title: anime.title.romaji || anime.title.english,
+    name: anime.title.english || anime.title.romaji,
+    poster_path: anime.coverImage.large
+  }));
 }
 
 /**
- * Busca detalhes completos de um anime específico pelo seu ID.
- * @param {number|string} id - O ID do anime na AniList.
- * @returns {Promise<object>} Um objeto com os detalhes completos do anime.
+ * Busca detalhes de um anime pelo ID, incluindo sinopse traduzida
+ * @param {number} id - ID do anime
+ * @returns {Promise<object>} - Dados detalhados do anime
  */
 export async function buscarDetalhesAnime(id) {
-  // Define a query para buscar detalhes de uma mídia específica por ID.
   const query = `
     query ($id: Int) {
       Media(id: $id, type: ANIME) {
         id
-        title {
-          romaji
-          english
-        }
-        coverImage {
-          large
-        }
-        description(asHtml: false)
+        title { romaji english }
+        coverImage { large }
+        bannerImage
+        description
         genres
         averageScore
       }
     }
   `;
   const variables = { id: Number(id) };
-  // Executa a busca na API.
   const response = await buscarNaAniList(query, variables);
   const anime = response.data.Media;
 
-  // Limpa as tags <br> da descrição e as substitui por quebras de linha.
-  const overviewLimpo = anime.description ? anime.description.replace(/<br\s*\/?>/gi, '\n') : null;
+  if (!anime) return null;
 
-  // Monta um objeto detalhado com os dados recebidos.
+  // Processa e traduz a sinopse se existir
+  let overviewFinal = 'Sem sinopse disponível.';
+  if (anime.description) {
+    const overviewLimpo = anime.description.replace(/<[^>]*>?/gm, '\n');
+    overviewFinal = await traduzirTexto(overviewLimpo, 'pt-BR');
+  }
+
   return {
     id: anime.id,
-    title: anime.title.romaji,
+    title: anime.title.romaji || anime.title.english,
     name: anime.title.english || anime.title.romaji,
     poster_path: anime.coverImage.large,
-    overview: overviewLimpo, 
-    genres: anime.genres.map(g => ({ name: g.name })),
-    vote_average: anime.averageScore / 10,
+    backdrop_path: anime.bannerImage,
+    overview: overviewFinal,
+    genres: anime.genres.map(g => ({ name: g })),
+    vote_average: anime.averageScore ? anime.averageScore / 10 : 0,
   };
 }
+
 /**
- * Pesquisa animes por um título ou termo.
- * @param {string} search - O termo de busca.
- * @returns {Promise<Array>} Uma lista de animes que correspondem ao título pesquisado.
+ * Busca animes pelo título, excluindo conteúdo adulto
+ * @param {string} search - Texto de busca (título do anime)
+ * @returns {Promise<Array>} - Lista de animes encontrados
  */
 export async function buscarAnimesPorTitulo(search) {
-    // Define a query que aceita um termo de busca 'search'.
-    const query = `
+  const query = `
       query ($search: String) {
         Page(page: 1, perPage: 24) {
-          media(search: $search, type: ANIME, sort: POPULARITY_DESC) {
+          media(search: $search, type: ANIME, sort: POPULARITY_DESC, isAdult: false) {
             id
-            title {
-              romaji
-              english
-            }
-            coverImage {
-              large
-            }
+            title { romaji english }
+            coverImage { large }
           }
         }
       }
     `;
-    const variables = { search };
-    // Executa a busca passando o termo como variável.
-    const response = await buscarNaAniList(query, variables);
-    // Mapeia a resposta para o formato padronizado.
-    return response.data.Page.media.map(anime => ({
-        id: anime.id,
-        title: anime.title.romaji,
-        name: anime.title.english || anime.title.romaji,
-        poster_path: anime.coverImage.large
-      }));
+  const variables = { search };
+  const response = await buscarNaAniList(query, variables);
+  return response.data.Page.media.map(anime => ({
+    id: anime.id,
+    title: anime.title.romaji || anime.title.english,
+    name: anime.title.english || anime.title.romaji,
+    poster_path: anime.coverImage.large
+  }));
 }

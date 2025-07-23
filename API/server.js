@@ -1,45 +1,43 @@
-// server.js
-import express from 'express';
-import dotenv from 'dotenv';
-import cors from 'cors';
+// --- IMPORTAÇÕES DE MÓDULOS E ROTAS ---
+import express from 'express'; // Framework para criação de servidor HTTP
+import dotenv from 'dotenv'; // Carrega variáveis de ambiente do arquivo .env
+import cors from 'cors'; // Habilita o compartilhamento de recursos entre origens (CORS)
+import { clearAll } from './services/cacheService.js'; // Serviço para limpeza de cache
 
-// Importação dos arquivos de rota para cada seção da API.
+// Importações das rotas
 import rotaFilmes from './routes/filmeRoutes.js';
 import rotaSeries from './routes/serieRoutes.js';
 import rotaAnimes from './routes/animeRoutes.js';
 import rotaAssistente from './routes/assistenteRoutes.js';
 
-// Carrega as variáveis de ambiente do arquivo .env para o `process.env`.
-// É importante que isso seja feito no início do arquivo.
-dotenv.config();
+dotenv.config(); // Carrega variáveis de ambiente
 
-// Cria a instância principal do aplicativo Express.
-const app = express();
-// Define a porta do servidor, usando a variável de ambiente ou 3001 como padrão.
-const PORTA = process.env.PORT || 3001;
+const app = express(); // Cria a aplicação Express
+const PORTA = process.env.PORT || 3001; // Define a porta do servidor
 
-// Habilita o CORS (Cross-Origin Resource Sharing) para permitir que o front-end
-// (rodando em localhost:5173) faça requisições para este servidor.
+// --- CONFIGURAÇÕES DE MIDDLEWARE ---
+// Usa a URL do frontend a partir das variáveis de ambiente em produção,
+// mas mantém localhost como fallback para desenvolvimento.
 app.use(cors({
-  origin: 'http://localhost:5173'
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173'
 }));
+app.use(express.json()); // Permite receber JSON no corpo das requisições
 
-// Adiciona o middleware que interpreta o corpo das requisições com formato JSON.
-// Essencial para rotas POST e PUT que enviam dados.
-app.use(express.json());
-
-
-// --- ROTAS DA APLICAÇÃO ---
-// Registra os roteadores, associando cada um a um prefixo de URL.
-// Todas as rotas de filmes começarão com /api/filmes, e assim por diante.
+// --- DEFINIÇÃO DAS ROTAS DA API ---
 app.use('/api/filmes', rotaFilmes);
 app.use('/api/series', rotaSeries);
 app.use('/api/animes', rotaAnimes);
 app.use('/api/assistente', rotaAssistente);
 
+// --- ROTINA DE ATUALIZAÇÃO AUTOMÁTICA DO CACHE ---
+// A cada 1 hora, o cache é limpo para garantir que novos dados sejam buscados
+const CACHE_REFRESH_INTERVAL = 3600000; // 1 hora em milissegundos
+setInterval(async () => {
+  console.log('Iniciando rotina de limpeza de cache...');
+  await clearAll(); // Limpa todo o cache armazenado
+}, CACHE_REFRESH_INTERVAL);
 
 // --- INICIALIZAÇÃO DO SERVIDOR ---
-// Inicia o servidor para que ele comece a "ouvir" requisições na porta definida.
 app.listen(PORTA, () => {
   console.log(`Servidor rodando na porta ${PORTA}`);
 });
