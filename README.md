@@ -1,6 +1,6 @@
 # TopStream
 
-### Link para o Deploy: [https://topstream-site.onrender.com](https://www.google.com/url?sa=E&source=gmail&q=https://topstream-site.onrender.com)
+### Link para o Deploy: [https://topstream-finder-site.onrender.com](https://topstream-finder-site.onrender.com)
 
 ## 📖 Sobre o Projeto
 
