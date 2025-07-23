@@ -109,7 +109,7 @@ export async function buscarDetalhesAnime(id) {
   let overviewFinal = 'Sem sinopse disponível.';
   if (anime.description) {
     const overviewLimpo = anime.description.replace(/<[^>]*>?/gm, '\n');
-    overviewFinal = await traduzirTexto(overviewLimpo, 'pt-BR');
+    overviewFinal = await traduzirTexto(overviewLimpo);
   }
 
   return {

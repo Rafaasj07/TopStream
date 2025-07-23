@@ -16,30 +16,10 @@ const app = express(); // Cria a aplicação Express
 const PORTA = process.env.PORT || 3001; // Define a porta do servidor
 
 // --- CONFIGURAÇÕES DE MIDDLEWARE ---
-// Define uma lista de origens permitidas para requisições CORS.
-// Em produção, usa o valor da variável de ambiente FRONTEND_URL.
-// Em desenvolvimento, permite também requisições do localhost na porta 5173.
-const allowedOrigins = [
-  process.env.FRONTEND_URL,     // Ex: https://meusite.com
-  'http://localhost:5173'       // Ambiente local, como Vite dev server
-].filter(Boolean);              // Remove valores "falsy" como undefined ou null
-
-// Configura o middleware CORS (Cross-Origin Resource Sharing)
+// Usa a URL do frontend a partir das variáveis de ambiente em produção,
+// mas mantém localhost como fallback para desenvolvimento.
 app.use(cors({
-  origin: function (origin, callback) {
-    // Permite requisições sem "origin", como as feitas por Postman ou aplicativos móveis
-    if (!origin) return callback(null, true);
-
-    // Verifica se a origem da requisição está na lista de origens permitidas
-    if (allowedOrigins.indexOf(origin) === -1) {
-      // Se não estiver, bloqueia a requisição e retorna erro
-      const msg = 'A política de CORS para este site não permite acesso da origem especificada.';
-      return callback(new Error(msg), false);
-    }
-
-    // Se a origem for permitida, continua normalmente
-    return callback(null, true);
-  }
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173'
 }));
 
 app.use(express.json()); // Permite receber JSON no corpo das requisições
