@@ -3,6 +3,7 @@ import NavPadrao from "../components/NavPadrao";
 import CardSuguestao from "../components/CardSuguestao";
 import { obterSugestao } from "../services/assistenteService"; // Importa a função da API.
 import DetalhesModal from "../components/DetalhesModal"; // Importa o componente do Modal.
+import NavInferior from "../components/NavInferior";
 
 // Página do Assistente, que usa IA para encontrar um conteúdo a partir de uma descrição.
 const Assistente = () => {
@@ -132,6 +133,7 @@ const Assistente = () => {
                     onClose={fecharModal}
                 />
             )}
+            <NavInferior></NavInferior>
         </div>
     );
 };

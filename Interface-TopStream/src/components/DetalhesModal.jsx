@@ -2,15 +2,24 @@ import { useState, useEffect } from 'react';
 import { buscarDetalhesFilme } from '../services/filmeService';
 import { buscarDetalhesSerie } from '../services/serieService';
 import { buscarDetalhesAnime } from '../services/animeService';
+// 1. Importe as funções de favoritos
+import { adicionarFavorito, removerFavorito, isFavorito } from '../services/favoritosService';
+
 
 // Componente do modal que exibe detalhes de um filme, série ou anime.
 const DetalhesModal = ({ item, tipo, onClose }) => {
     // Estados para guardar os detalhes e controlar o carregamento.
     const [detalhes, setDetalhes] = useState(null);
     const [carregando, setCarregando] = useState(true);
+    // 2. Estado para controlar se o item é um favorito
+    const [favorito, setFavorito] = useState(false);
+    
 
     // Busca os dados do item quando o componente é montado ou o item muda.
     useEffect(() => {
+        // 3. Verifica o status de favorito assim que o modal abre
+        setFavorito(isFavorito(item.id));
+
         const fetchDetalhes = async () => {
             if (!item) return;
             try {
@@ -35,9 +44,20 @@ const DetalhesModal = ({ item, tipo, onClose }) => {
         fetchDetalhes();
     }, [item, tipo]);
 
+    // 4. Função para adicionar ou remover dos favoritos
+    const handleToggleFavorito = () => {
+        if (favorito) {
+            removerFavorito(item.id);
+        } else {
+            // Salva o item e seu tipo para usar na página de Favoritos
+            adicionarFavorito(item, tipo);
+        }
+        setFavorito(!favorito); // Atualiza o ícone da estrela
+    };
+
     // Formata a URL da imagem, tratando diferentes fontes (TMDB ou AniList).
     const getImagemUrl = (path) => {
-        if (!path) return '';
+        if (!path) return null;
         if (path.startsWith('http')) return path;
         return `https://image.tmdb.org/t/p/w500${path}`;
     };
@@ -79,7 +99,18 @@ const DetalhesModal = ({ item, tipo, onClose }) => {
                             <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent"></div>
                         </div>
                         <div className="p-6 -mt-16 relative z-10">
-                            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">{detalhes?.title || detalhes?.name}</h2>
+                            {/* 5. Wrapper para o título e o botão de favorito */}
+                            <div className="flex justify-between items-start gap-4">
+                                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">{detalhes?.title || detalhes?.name}</h2>
+                                <button
+                                    onClick={handleToggleFavorito}
+                                    className={`flex-shrink-0 text-3xl transition-all duration-200 transform hover:scale-110 ${favorito ? 'text-yellow-400' : 'text-gray-500 hover:text-yellow-300'}`}
+                                    aria-label="Adicionar aos Favoritos"
+                                >
+                                    <i className={`${favorito ? 'bx bxs-star' : 'bx bx-star'}`}></i>
+                                </button>
+                            </div>
+                            
                             <div className="flex flex-wrap items-center text-gray-400 text-sm mb-4 gap-x-3 gap-y-1">
                                 {/* Informações como ano, gênero e avaliação. */}
                                 {(detalhes?.release_date || detalhes?.first_air_date) && <span>{new Date(detalhes.release_date || detalhes.first_air_date).getFullYear()}</span>}
@@ -89,7 +120,7 @@ const DetalhesModal = ({ item, tipo, onClose }) => {
                                         <span>{detalhes.genres.map(g => g.name).slice(0, 3).join(', ')}</span>
                                     </>
                                 )}
-                                {detalhes?.vote_average && (
+                                {detalhes?.vote_average > 0 && (
                                     <>
                                         <span>•</span>
                                         <span className="flex items-center gap-1"><i className='bx bxs-star text-yellow-400'></i> {detalhes.vote_average.toFixed(1)}</span>
