@@ -31,7 +31,7 @@ const Favoritos = () => {
             <NavPadrao /> {/* Navbar superior */}
 
             {/* Container principal da página */}
-            <main className="flex flex-col pb-5 sm:pb-8 pt-18 sm:pt-26">
+            <main className="flex flex-col pb-15 sm:pb-8 pt-18 sm:pt-26">
                 {/* Se houver ao menos 1 favorito, exibe os grupos */}
                 {totalFavoritos > 0 ? (
                     <>
@@ -75,7 +75,6 @@ const Favoritos = () => {
             </main>
 
             <NavInferior /> {/* Barra de navegação inferior (mobile) */}
-            <Footer />
         </div>
     );
 };
