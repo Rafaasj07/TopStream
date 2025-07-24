@@ -1,3 +1,6 @@
+// TopStream - Copia/API/services/anilistService.js
+
+// Importa o axios para realizar chamadas HTTP e o serviço de tradução.
 import axios from 'axios';
 import { traduzirTexto } from './traducaoService.js';
 
@@ -5,10 +8,10 @@ import { traduzirTexto } from './traducaoService.js';
 const ANILIST_API_URL = 'https://graphql.anilist.co';
 
 /**
- * Função genérica que faz requisição GraphQL para a AniList
- * @param {string} query - A query GraphQL a ser enviada
- * @param {object} variables - Variáveis da query
- * @returns {Promise<object>} - Dados da resposta
+ * Função genérica para fazer requisições GraphQL à AniList
+ * @param {string} query - A consulta GraphQL (query ou mutation)
+ * @param {object} variables - Variáveis utilizadas na consulta
+ * @returns {Promise<object>} - Resposta da API
  */
 async function buscarNaAniList(query, variables) {
   try {
@@ -23,14 +26,15 @@ async function buscarNaAniList(query, variables) {
     });
     return response.data;
   } catch (error) {
+    // Em caso de erro, exibe no console e lança uma exceção
     console.error('Erro ao acessar AniList API:', error.response ? error.response.data : error.message);
     throw new Error('Não foi possível buscar dados da AniList.');
   }
 }
 
 /**
- * Busca os 10 animes mais populares, excluindo conteúdo adulto
- * @returns {Promise<Array>} - Lista de animes
+ * Busca os 10 animes mais populares da AniList (excluindo conteúdo adulto)
+ * @returns {Promise<Array>} - Lista de animes populares
  */
 export async function buscarTopAnimes() {
   const query = `
@@ -45,6 +49,7 @@ export async function buscarTopAnimes() {
       }
     `;
   const response = await buscarNaAniList(query);
+  // Formata o resultado para manter consistência com o padrão usado nos cards
   return response.data.Page.media.map(anime => ({
     id: anime.id,
     title: anime.title.romaji || anime.title.english,
@@ -54,9 +59,9 @@ export async function buscarTopAnimes() {
 }
 
 /**
- * Busca animes por gênero, excluindo conteúdo adulto
- * @param {string} genre - Gênero a ser buscado
- * @returns {Promise<Array>} - Lista de animes do gênero
+ * Busca animes de um determinado gênero
+ * @param {string} genre - Gênero a buscar (ex: "Action", "Drama")
+ * @returns {Promise<Array>} - Lista de animes encontrados
  */
 export async function buscarAnimesPorGenero(genre) {
   const query = `
@@ -81,8 +86,12 @@ export async function buscarAnimesPorGenero(genre) {
 }
 
 /**
- * Busca detalhes de um anime pelo ID, incluindo sinopse traduzida
- * @param {number} id - ID do anime
+ * Busca os detalhes completos de um anime, incluindo:
+ * - Sinopse (traduzida para PT-BR)
+ * - Gêneros
+ * - Nota média (convertida de 100 para escala 10)
+ * - Trailer (caso exista e seja do YouTube)
+ * @param {number} id - ID do anime no AniList
  * @returns {Promise<object>} - Dados detalhados do anime
  */
 export async function buscarDetalhesAnime(id) {
@@ -96,6 +105,10 @@ export async function buscarDetalhesAnime(id) {
         description
         genres
         averageScore
+        trailer {
+          id
+          site
+        }
       }
     }
   `;
@@ -105,12 +118,15 @@ export async function buscarDetalhesAnime(id) {
 
   if (!anime) return null;
 
-  // Processa e traduz a sinopse se existir
+  // Remove tags HTML e traduz a sinopse para português
   let overviewFinal = 'Sem sinopse disponível.';
   if (anime.description) {
-    const overviewLimpo = anime.description.replace(/<[^>]*>?/gm, '\n');
-    overviewFinal = await traduzirTexto(overviewLimpo);
+    const overviewLimpo = anime.description.replace(/<[^>]*>?/gm, '\n'); // Remove tags HTML
+    overviewFinal = await traduzirTexto(overviewLimpo); // Tradução automática
   }
+
+  // Verifica se há trailer no YouTube e extrai o ID
+  const trailer = anime.trailer && anime.trailer.site === 'youtube' ? anime.trailer.id : null;
 
   return {
     id: anime.id,
@@ -119,15 +135,16 @@ export async function buscarDetalhesAnime(id) {
     poster_path: anime.coverImage.large,
     backdrop_path: anime.bannerImage,
     overview: overviewFinal,
-    genres: anime.genres.map(g => ({ name: g })),
-    vote_average: anime.averageScore ? anime.averageScore / 10 : 0,
+    genres: anime.genres.map(g => ({ name: g })), // Formata os gêneros no mesmo estilo do TMDB
+    vote_average: anime.averageScore ? anime.averageScore / 10 : 0, // Converte nota 0–100 para 0–10
+    trailer_key: trailer, // ID do vídeo do YouTube (usado no iframe do modal)
   };
 }
 
 /**
- * Busca animes pelo título, excluindo conteúdo adulto
- * @param {string} search - Texto de busca (título do anime)
- * @returns {Promise<Array>} - Lista de animes encontrados
+ * Busca animes pelo título informado, similar à busca global
+ * @param {string} search - Termo de busca
+ * @returns {Promise<Array>} - Lista de animes que correspondem
  */
 export async function buscarAnimesPorTitulo(search) {
   const query = `
