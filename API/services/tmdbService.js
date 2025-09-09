@@ -14,7 +14,26 @@ const GENEROS_EXCLUIDOS = [10749];
 
 // Palavras-chave para filtrar conteúdos inadequados
 const PALAVRAS_PROIBIDAS = [
-  // ... (você pode definir palavras que indiquem conteúdo adulto)
+  // Português
+  'hentai', 'adulto', '+18', '18+', 'xxx', 'erótico', 'erotico', 'pornô', 'porno', 'porn',
+  'sexual', 'sexo', 'nude', 'nudes', 'nudez', 'sensual', 'sedutor', 'sedução', 'orgasmo',
+  'fetiche', 'bdsm', 'yaoi', 'yuri', 'ecchi', 'nsfw', 'tentáculo', 'incesto', 'pedofilia',
+  'abuso', 'explícito', 'explicit', 'vulgar', 'lascivo', 'obsceno', 'perverso',
+  'prostituição', 'prostituta', 'strip', 'striper', 'bordel', 'dominação', 'submisso',
+  'submissa', 'sugestivo', 'safado', 'safadeza', 'garotas quentes', 'garoto quente',
+  'garota sexy', 'garoto sexy', 'sexo explícito', 'conteúdo adulto', 'prazer', 'masturbação',
+  'peitos', 'seios', 'bundas', 'nádegas', 'genitália', 'vagina', 'pênis', 'boquete',
+  'chupar', 'gozar', 'gozo', 'ejacular', 'ejaculação', 'penetração', 'beijo técnico',
+
+  // Inglês
+  'hentai', 'adult', '18+', 'xxx', 'pussy', 'erotic', 'porn', 'sexual', 'sex', 'nude', 'nudes',
+  'sensual', 'seductive', 'orgasm', 'fetish', 'bdsm', 'yaoi', 'yuri', 'ecchi', 'nsfw',
+  'tentacle', 'incest', 'pedophilia', 'abuse', 'explicit', 'vulgar', 'lewd', 'obscene',
+  'perverse', 'prostitution', 'prostitute', 'strip', 'stripper', 'brothel', 'domination',
+  'submissive', 'suggestive', 'naughty', 'hot girls', 'hot boy', 'sexy girl', 'sexy boy',
+  'explicit sex', 'adult content', 'pleasure', 'masturbation', 'boobs', 'tits', 'butt',
+  'ass', 'genitals', 'vagina', 'penis', 'blowjob', 'suck', 'cum', 'ejaculate', 'penetration',
+  'technical kiss'
 ];
 
 // Função que normaliza texto: tira acentos e coloca tudo em minúsculas

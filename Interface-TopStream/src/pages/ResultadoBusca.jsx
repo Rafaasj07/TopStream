@@ -124,8 +124,8 @@ const ResultadoBusca = () => {
     return (
         <div className="bg-gray-950 min-h-screen">
             <NavPadrao />
-            <main className="flex flex-col gap-1 pb-8 pt-28">
-                <h1 className="text-white text-3xl font-bold px-3">Resultados para: <span className="text-indigo-400">{query}</span></h1>
+            <main className="flex flex-col gap-1 py-15 lg:pt-24 lg:pb-6">
+                <h1 className="text-white text-3xl font-bold px-3 lg:pb-3">Resultados para: <span className="text-indigo-400">{query}</span></h1>
                 {carregando ? (
                     <p className="text-gray-400 text-lg px-4">Buscando...</p>
                 ) : (

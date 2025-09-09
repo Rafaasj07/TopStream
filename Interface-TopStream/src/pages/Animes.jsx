@@ -28,14 +28,11 @@ const Animes = () => {
                 <CardSection nomeSecao="Animes de Fantasia" fetchFunction={buscarAnimesPorGenero} fetchParams={["Fantasy"]} tipo="anime" />
                 <CardSection nomeSecao="Animes de Terror" fetchFunction={buscarAnimesPorGenero} fetchParams={["Horror"]} tipo="anime" />
                 <CardSection nomeSecao="Animes Mecha" fetchFunction={buscarAnimesPorGenero} fetchParams={["Mecha"]} tipo="anime" />
-                <CardSection nomeSecao="Animes de Música" fetchFunction={buscarAnimesPorGenero} fetchParams={["Music"]} tipo="anime" />
                 <CardSection nomeSecao="Animes de Mistério" fetchFunction={buscarAnimesPorGenero} fetchParams={["Mystery"]} tipo="anime" />
-                <CardSection nomeSecao="Animes Psicológicos" fetchFunction={buscarAnimesPorGenero} fetchParams={["Psychological"]} tipo="anime" />
                 <CardSection nomeSecao="Animes de Romance" fetchFunction={buscarAnimesPorGenero} fetchParams={["Romance"]} tipo="anime" />
                 <CardSection nomeSecao="Animes de Ficção Científica" fetchFunction={buscarAnimesPorGenero} fetchParams={["Sci-Fi"]} tipo="anime" />
                 <CardSection nomeSecao="Slice of Life" fetchFunction={buscarAnimesPorGenero} fetchParams={["Slice of Life"]} tipo="anime" />
                 <CardSection nomeSecao="Animes de Esporte" fetchFunction={buscarAnimesPorGenero} fetchParams={["Sports"]} tipo="anime" />
-                <CardSection nomeSecao="Animes Sobrenaturais" fetchFunction={buscarAnimesPorGenero} fetchParams={["Supernatural"]} tipo="anime" />
                 <CardSection nomeSecao="Animes de Suspense" fetchFunction={buscarAnimesPorGenero} fetchParams={["Thriller"]} tipo="anime" />
             </main>
 
