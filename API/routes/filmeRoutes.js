@@ -8,22 +8,16 @@ import {
 
 const rotaFilmes = express.Router();
 
-/**
- * Define as rotas para as funcionalidades de filmes.
- * Cada rota corresponde a uma operação, como buscar os mais populares,
- * filtrar por gênero, pesquisar por título ou ver detalhes de um filme.
- */
-
-// Rota para listar os 10 filmes mais populares.
+// Rota para listar os filmes mais populares
 rotaFilmes.get('/top10', listarTopFilmes);
 
-// Rota para listar filmes de um gênero específico.
+// Rota para filtrar filmes por gênero
 rotaFilmes.get('/genero/:id', listarFilmesPorGenero);
 
-// Rota para pesquisar filmes por um termo de busca (query).
+// Rota para pesquisar filmes por título
 rotaFilmes.get('/pesquisar', pesquisarFilmes);
 
-// Rota para obter os detalhes de um filme específico pelo seu ID.
+// Rota para obter detalhes de um filme por ID
 rotaFilmes.get('/:id', detalhesDoFilme);
 
 export default rotaFilmes;

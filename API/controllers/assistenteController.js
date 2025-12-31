@@ -1,17 +1,9 @@
-// controllers/assistenteController.js
 import * as assistenteService from '../services/assistenteService.js';
 import * as tmdbService from '../services/tmdbService.js';
 import * as anilistService from '../services/anilistService.js';
 
-/**
- * Processa uma descrição de texto para sugerir um único filme, série ou anime.
- * Esta função recebe uma descrição textual, usa um serviço de IA para
- * analisar e extrair o tipo de mídia e o termo de busca, e então
-- * busca no serviço correspondente (TMDB para filmes/séries, Anilist para animes)
- * para retornar o resultado mais relevante.
- */
+// Processa a descrição de texto via IA e retorna uma sugestão de mídia correspondente
 export async function obterSugestaoUnica(req, res) {
-  // Pega a descrição do corpo da requisição POST
   const { descricao } = req.body;
 
   if (!descricao) {
@@ -19,7 +11,7 @@ export async function obterSugestaoUnica(req, res) {
   }
 
   try {
-    // 1. Pede para a IA analisar a descrição e retornar o tipo e o termo de busca
+    // Analisa a descrição para extrair o tipo de mídia e o termo de busca
     const analise = await assistenteService.analisarDescricaoParaBusca(descricao);
 
     const { tipo, termo_busca } = analise;
@@ -30,7 +22,7 @@ export async function obterSugestaoUnica(req, res) {
 
     let resultados = [];
 
-    // 2. Com base no tipo, chama o serviço de busca apropriado
+    // Executa a busca no serviço específico (TMDB ou AniList) baseado no tipo identificado
     switch (tipo) {
       case 'filme':
         resultados = await tmdbService.buscarFilmesPorTitulo(termo_busca);
@@ -39,14 +31,13 @@ export async function obterSugestaoUnica(req, res) {
         resultados = await tmdbService.buscarSeriesPorTitulo(termo_busca);
         break;
       case 'anime':
-        // Agora usando o anilistService
         resultados = await anilistService.buscarAnimesPorTitulo(termo_busca);
         break;
       default:
         return res.status(400).json({ erro: 'Tipo de conteúdo inválido retornado pela IA.' });
     }
 
-    // 3. Pega o primeiro resultado (o mais relevante) e o retorna
+    // Seleciona o primeiro resultado como o mais relevante
     const sugestaoPrincipal = resultados[0];
 
     if (!sugestaoPrincipal) {

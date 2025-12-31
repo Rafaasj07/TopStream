@@ -1,4 +1,3 @@
-// Importa os componentes e funções necessárias
 import CardSection from "../components/CardSection";
 import NavPadrao from "../components/NavPadrao";
 import NavInferior from "../components/NavInferior";
@@ -6,18 +5,15 @@ import FiltroMobile from "../components/FiltroMobile";
 import Footer from "../components/Footer";
 import { buscarTopFilmes, buscarFilmesPorGenero } from "../services/filmeService";
 
-// Página principal de filmes
+// Página principal que lista filmes populares e categorias por gênero
 const Filmes = () => {
     return (
         <div className="bg-gray-950 min-h-screen">
-            <NavPadrao /> {/* Barra de navegação superior */}
-            <FiltroMobile /> {/* Filtros visíveis apenas no mobile */}
+            <NavPadrao />
+            <FiltroMobile />
 
-            {/* Conteúdo principal da página */}
             <main className="flex flex-col pb-5 sm:pg-8 lg:pb-6 pt-0.5 sm:pt-22 lg:pt-26">
-                {/* Seção de destaque com os 10 filmes mais populares */}
                 <CardSection nomeSecao="Top 10 Filmes do Momento" fetchFunction={buscarTopFilmes} tipo="filme" />
-                {/* Seções com gêneros*/}
                 <CardSection nomeSecao="Filmes de Ação" fetchFunction={buscarFilmesPorGenero} fetchParams={[28]} tipo="filme" />
                 <CardSection nomeSecao="Ficção Científica" fetchFunction={buscarFilmesPorGenero} fetchParams={[878]} tipo="filme" />
                 <CardSection nomeSecao="Suspense e Mistério" fetchFunction={buscarFilmesPorGenero} fetchParams={[53, 9648]} tipo="filme" />
@@ -32,13 +28,12 @@ const Filmes = () => {
                 <CardSection nomeSecao="Filmes de Faroeste" fetchFunction={buscarFilmesPorGenero} fetchParams={[37]} tipo="filme" />
                 <CardSection nomeSecao="Filmes Românticos" fetchFunction={buscarFilmesPorGenero} fetchParams={[10749]} tipo="filme" />
                 <CardSection nomeSecao="Clássicos de TV" fetchFunction={buscarFilmesPorGenero} fetchParams={[10770]} tipo="filme" />
-
             </main>
 
-            <NavInferior /> {/* Navegação inferior (mobile) */}
+            <NavInferior />
             <Footer />
         </div>
     );
 };
 
-export default Filmes; 
+export default Filmes;

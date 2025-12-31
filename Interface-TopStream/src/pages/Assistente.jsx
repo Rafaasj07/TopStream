@@ -5,9 +5,7 @@ import { obterSugestao } from "../services/assistenteService";
 import DetalhesModal from "../components/DetalhesModal";
 import NavInferior from "../components/NavInferior";
 
-// Página do Assistente, que usa IA para encontrar um conteúdo a partir de uma descrição.
 const Assistente = () => {
-    // Estados para gerenciar a entrada do usuário, o resultado, o carregamento e o modal.
     const [input, setInput] = useState("");
     const [resultado, setResultado] = useState(null);
     const [carregando, setCarregando] = useState(false);
@@ -16,11 +14,10 @@ const Assistente = () => {
     const [itemModal, setItemModal] = useState(null);
     const [tipoConteudo, setTipoConteudo] = useState(null);
 
-    // Funções para controlar a exibição do modal de detalhes.
     const abrirModal = (item) => setItemModal(item);
     const fecharModal = () => setItemModal(null);
 
-    // Lida com o envio do formulário, chamando a API do assistente.
+    // Envia a descrição do usuário para a API e processa a sugestão retornada
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!input.trim()) return;
@@ -32,10 +29,11 @@ const Assistente = () => {
         setErro(null);
 
         try {
+            // Chama o serviço de IA para obter uma sugestão
             const sugestaoDaApi = await obterSugestao(input);
 
             if (sugestaoDaApi && sugestaoDaApi.id) {
-                // Determina o tipo de conteúdo com base nas chaves do objeto retornado.
+                // Identifica o tipo de conteúdo (filme, série ou anime) baseado nos campos de data
                 if (sugestaoDaApi.first_air_date) {
                     setTipoConteudo('serie');
                 } else if (sugestaoDaApi.release_date) {
@@ -56,20 +54,18 @@ const Assistente = () => {
         }
     };
 
-    // Constrói a URL da imagem, tratando fontes diferentes (TMDB/AniList).
+    // Formata a URL da imagem, adicionando o domínio do TMDB se necessário
     const getImagemUrl = (path) => {
         if (!path) return '';
         if (path.startsWith("http")) return path;
         return `https://image.tmdb.org/t/p/w500${path}`;
     };
 
-    // Renderização da página.
     return (
         <div className="bg-gray-950 min-h-screen text-white">
             <NavPadrao />
 
             <main className="w-full max-w-4xl pt-24 mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-                {/* Cabeçalho e formulário de busca. */}
                 <div className="flex flex-col items-center justify-center gap-3 text-center mb-8">
                     <i className="bx bxs-bot text-5xl text-indigo-400" />
                     <h1 className="text-white text-3xl sm:text-4xl font-bold">
@@ -101,7 +97,6 @@ const Assistente = () => {
                     </button>
                 </form>
 
-                {/* Seção que exibe o resultado da busca ou uma mensagem de erro. */}
                 <section className="mt-16">
                     {buscaRealizada && !carregando && (
                         <>
@@ -125,7 +120,6 @@ const Assistente = () => {
                 </section>
             </main>
 
-            {/* Renderiza o modal de detalhes se um item for selecionado. */}
             {itemModal && (
                 <DetalhesModal
                     item={itemModal}

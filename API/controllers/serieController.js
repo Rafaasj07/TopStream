@@ -5,7 +5,7 @@ import {
   buscarSeriesPorTitulo
 } from '../services/tmdbService.js';
 
-// Função para buscar as séries mais populares ou mais bem avaliadas.
+// Retorna a lista de séries mais populares
 export async function listarTopSeries(req, res) {
   try {
     const series = await buscarTopSeries();
@@ -15,7 +15,7 @@ export async function listarTopSeries(req, res) {
   }
 }
 
-// Função para buscar séries filtrando por um gênero específico.
+// Busca séries de um gênero específico pelo ID
 export async function listarSeriesPorGenero(req, res) {
   const { id } = req.params;
   try {
@@ -26,7 +26,7 @@ export async function listarSeriesPorGenero(req, res) {
   }
 }
 
-// Função para obter os detalhes de uma série específica pelo seu ID.
+// Obtém detalhes completos de uma série pelo ID
 export async function detalhesDaSerie(req, res) {
   const { id } = req.params;
   try {
@@ -37,7 +37,7 @@ export async function detalhesDaSerie(req, res) {
   }
 }
 
-// Função para pesquisar séries com base em um título ou termo de busca.
+// Pesquisa séries por título na API
 export async function pesquisarSerie(req, res) {
   const { query } = req.query;
   if (!query) return res.status(400).json({ erro: 'Parâmetro "query" é obrigatório.' });
@@ -49,4 +49,3 @@ export async function pesquisarSerie(req, res) {
     res.status(500).json({ erro: erro.message });
   }
 }
-

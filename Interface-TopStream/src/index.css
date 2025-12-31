@@ -1,41 +1,25 @@
 @import "tailwindcss";
 
-/* --- UTILITÁRIOS GERAIS --- */
-
-/* Classe para esconder a barra de rolagem, mas manter a funcionalidade de scroll. */
 .scroll-invisivel {
-  scrollbar-width: none; /* Para Firefox */
+  scrollbar-width: none; 
 }
 .scroll-invisivel::-webkit-scrollbar {
-  display: none; /* Para Chrome, Safari e outros baseados em WebKit */
+  display: none; 
 }
 
-/* --- ESTILOS DE COMPONENTES --- */
-
-/* Efeito para controles de um carrossel ou "passador" de slides. */
-/* Por padrão, o controle fica invisível. */
 .passador .controle {
   opacity: 0;
-  transition: opacity 0.3s ease; /* Anima a transição da opacidade. */
+  transition: opacity 0.3s ease; 
 }
-
-/* Quando o mouse está sobre o elemento "passador", o controle se torna visível. */
 .passador:hover .controle {
   opacity: 1;
 }
 
-
-/* --- ESTILOS GLOBAIS DA PÁGINA --- */
-
 html, body {
-  /* Define a cor de fundo padrão para toda a página. */
-  background-color: #030712; /* Equivalente a 'bg-gray-950' do Tailwind */
-  
-  /* Reserva espaço para a barra de rolagem para evitar que o layout "pule" quando ela aparece. */
+  background-color: #030712; 
   scrollbar-gutter: stable;
 }
 
- /* Animação de entrada do modal. */
  @keyframes fade-in-up {
   from {
     opacity: 0;

@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 
+// Componente de menu mobile para navegação rápida entre categorias
 const FiltroMobile = () => {
     const navegar = useNavigate();
     const location = useLocation();

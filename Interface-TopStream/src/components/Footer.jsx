@@ -1,15 +1,12 @@
-// Componente do rodapé, contendo informações do desenvolvedor e créditos.
+// Renderiza o rodapé contendo informações do desenvolvedor e créditos das APIs
 const Footer = () => {
     return (
-        // O container principal do rodapé.
         <footer className="w-full bg-gray-950 text-center pb-18 sm:pb-15 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
-                {/* Nome do desenvolvedor. */}
                 <p className="text-gray-200 text-xl sm:text-2xl font-bold font-mono mb-4">
                     Desenvolvido por Rafael Augusto
                 </p>
 
-                {/* Links para redes sociais, que se ajustam de coluna para linha em telas maiores. */}
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 items-center justify-center mb-6">
                     <a
                         href="https://github.com/rafaasj07"
@@ -32,7 +29,6 @@ const Footer = () => {
                     </a>
                 </div>
 
-                {/* Créditos das APIs utilizadas. */}
                 <div className="text-gray-500 text-sm sm:text-base font-mono leading-relaxed">
                     Dados fornecidos por&nbsp;
                     <a

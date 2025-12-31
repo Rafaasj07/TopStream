@@ -1,4 +1,3 @@
-// Importa componentes de layout e serviço de dados
 import CardSection from "../components/CardSection";
 import NavPadrao from "../components/NavPadrao";
 import NavInferior from "../components/NavInferior";
@@ -6,19 +5,16 @@ import FiltroMobile from "../components/FiltroMobile";
 import { buscarTopSeries, buscarSeriesPorGenero } from "../services/serieService";
 import Footer from "../components/Footer";
 
-// Página principal de Séries
+// Página principal que lista séries populares e categorias por gênero
 const Series = () => {
     return (
         <div className="bg-gray-950 min-h-screen">
-            <NavPadrao />     {/* Barra de navegação superior */}
-            <FiltroMobile />  {/* Filtro lateral exibido em dispositivos móveis */}
+            <NavPadrao />
+            <FiltroMobile />
 
-            {/* Conteúdo principal da página */}
             <main className="flex flex-col pb-5 sm:pg-8 lg:pb-6 pt-0.5 sm:pt-22 lg:pt-26">
-                {/* Seção de destaque com as 10 séries mais populares */}
                 <CardSection nomeSecao="Top 10 Séries em Alta" fetchFunction={buscarTopSeries} tipo="serie" />
 
-                {/* Seções com gêneros*/}
                 <CardSection nomeSecao="Séries de Ação e Aventura" fetchFunction={buscarSeriesPorGenero} fetchParams={[10759]} tipo="serie" />
                 <CardSection nomeSecao="Séries de Animação" fetchFunction={buscarSeriesPorGenero} fetchParams={[16]} tipo="serie" />
                 <CardSection nomeSecao="Comédias para Rir Alto" fetchFunction={buscarSeriesPorGenero} fetchParams={[35]} tipo="serie" />
@@ -33,13 +29,12 @@ const Series = () => {
                 <CardSection nomeSecao="Reality Shows" fetchFunction={buscarSeriesPorGenero} fetchParams={[10764]} tipo="serie" />
                 <CardSection nomeSecao="Novelas" fetchFunction={buscarSeriesPorGenero} fetchParams={[10766]} tipo="serie" />
                 <CardSection nomeSecao="Talk Shows" fetchFunction={buscarSeriesPorGenero} fetchParams={[10767]} tipo="serie" />
-
             </main>
 
-            <NavInferior /> {/* Navegação inferior visível em mobile */}
+            <NavInferior />
             <Footer />
         </div>
     );
 };
 
-export default Series; 
+export default Series;

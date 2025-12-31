@@ -1,9 +1,5 @@
-// --- IMPORTAÇÕES ESSENCIAIS ---
-// Importa os componentes do React Router.
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-// --- IMPORTAÇÃO DAS PÁGINAS ---
-// Importa todos os componentes que representam as páginas da aplicação.
 import Home from './pages/Home';
 import Filmes from './pages/Filmes';
 import Series from './pages/Series';
@@ -15,12 +11,9 @@ import Favoritos from './pages/Favoritos';
 
 function App() {
   return (
-    // --- RENDERIZAÇÃO DAS ROTAS ---
-    // Habilita o roteamento na aplicação.
+    // Configura o roteamento e define as páginas da aplicação
     <BrowserRouter>
-      {/* Define a área onde as rotas serão renderizadas. */}
       <Routes>
-        {/* Define cada rota e o componenteAVA correspondente. */}
         <Route path="/Home" element={<Home />} />
         <Route path="/Filmes" element={<Filmes />} />
         <Route path="/Series" element={<Series />} />
@@ -29,7 +22,7 @@ function App() {
         <Route path="/Pesquisar" element={<Pesquisar />} />
         <Route path="/busca/:query" element={<ResultadoBusca />} />
         <Route path="/Favoritos" element={<Favoritos />} />
-        {/* Redireciona para /Home caso a rota não exista */}
+        {/* Redireciona qualquer rota desconhecida para a Home */}
         <Route path="*" element={<Navigate to="/Home" />} />
       </Routes>
     </BrowserRouter>

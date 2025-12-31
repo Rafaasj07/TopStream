@@ -1,19 +1,13 @@
-// --- IMPORTAÇÕES ESSENCIAIS ---
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import './index.css';
 
-
-// --- RENDERIZAÇÃO DA APLICAÇÃO ---
-
-// Localiza o elemento HTML com o id 'root' no arquivo public/index.html.
+// Seleciona o elemento raiz do DOM e inicializa a aplicação React
 const rootElement = document.getElementById('root');
-// Cria a "raiz" da aplicação React dentro do elemento HTML encontrado.
 const root = createRoot(rootElement);
 
-// Renderiza (desenha) o componente principal <App /> dentro da raiz.
-// O StrictMode envolve o App para ativar checagens e avisos extras em modo de desenvolvimento.
+// Renderiza o componente principal encapsulado pelo StrictMode
 root.render(
   <StrictMode>
     <App />

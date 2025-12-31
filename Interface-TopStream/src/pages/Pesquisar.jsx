@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import CardPesquisar from "../components/CardPesquisar";
 import NavInferior from "../components/NavInferior";
 
-// Importa as imagens para os cards de categoria.
 import ImagemAnimeAcao from "../assets/Categoria-Anime-Acao.jpg";
 import ImagemSerieComedia from "../assets/Categoria-Serie-Comedia.jpg";
 import ImagemFilmeDrama from "../assets/Categoria-Filme-Drama.jpg";
@@ -15,14 +14,12 @@ import ImagemSerieSuspense from "../assets/Categoria-Serie-Suspense.jpg";
 import ImagemFilmeAventura from "../assets/Categoria-Filme-Aventura.jpg";
 import ImagemFilmeSlice from "../assets/Categoria-Serie-Slice.jpg";
 
-// Página de pesquisa, onde o usuário pode buscar por um termo ou navegar por categorias.
+// Página de pesquisa que permite buscar por texto ou navegar por categorias visuais
 const Pesquisar = () => {
-    // Estados para controlar o input do usuário e o filtro selecionado.
     const [input, setInput] = useState("");
     const [filtroSelecionado, setFiltroSelecionado] = useState("todos");
     const navegar = useNavigate();
 
-    // Funções para lidar com as ações do usuário e navegar para a página de resultados.
     const handleChange = (e) => {
         setInput(e.target.value);
     };
@@ -31,6 +28,7 @@ const Pesquisar = () => {
         setFiltroSelecionado(filtro);
     };
 
+    // Submete a busca e redireciona para a rota de resultados com o termo e filtro atuais
     const handleBuscaSubmit = (e) => {
         e.preventDefault();
         if (input.trim() !== "") {
@@ -38,13 +36,13 @@ const Pesquisar = () => {
         }
     };
 
+    // Redireciona para a busca filtrada por um gênero específico ao clicar no card
     const handleGenreClick = (genre) => {
         navegar(`/busca/${genre}`);
     };
 
     return (
         <>
-            {/* Barra de pesquisa e filtros, visíveis apenas em telas pequenas. */}
             <form
                 onSubmit={handleBuscaSubmit}
                 className="w-full bg-gray-950 p-4 flex items-center gap-3 fixed top-0 left-0 z-50 sm:hidden"
@@ -110,7 +108,6 @@ const Pesquisar = () => {
             </div>
 
 
-            {/* Seção com os cards de categorias de gênero. */}
             <div className="pb-6">
                 <h1 className="text-white text-2xl font-bold py-4 px-5">Categorias</h1>
                 <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 gap-3 px-4 pb-16">

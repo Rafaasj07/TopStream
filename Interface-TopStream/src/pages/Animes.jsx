@@ -1,4 +1,3 @@
-// Importa os componentes e funções necessárias
 import CardSection from "../components/CardSection";
 import NavPadrao from "../components/NavPadrao";
 import NavInferior from "../components/NavInferior";
@@ -6,21 +5,19 @@ import FiltroMobile from "../components/FiltroMobile";
 import { buscarTopAnimes, buscarAnimesPorGenero } from "../services/animeService";
 import Footer from "../components/Footer";
 
-// Página principal de Animes
+// Página principal de animes que lista populares e gêneros específicos
 const Animes = () => {
     return (
         <div className="bg-gray-950 min-h-screen">
-            {/* Navegação superior */}
+            {/* Componentes de navegação e filtros */}
             <NavPadrao />
-
-            {/* Filtro de categorias (somente mobile) */}
             <FiltroMobile />
 
-            {/* Conteúdo principal da página */}
             <main className="flex flex-col pb-5 sm:pg-8 lg:pb-6 pt-0.5 sm:pt-22 lg:pt-26">
-                {/* Seção de destaque com os 10 animes mais populares */}
+                {/* Lista os top 10 animes mais populares */}
                 <CardSection nomeSecao="Top 10 Animes Populares" fetchFunction={buscarTopAnimes} tipo="anime" />
-                {/* Seções com gêneros*/}
+
+                {/* Listas categorizadas por gênero */}
                 <CardSection nomeSecao="Animes de Ação" fetchFunction={buscarAnimesPorGenero} fetchParams={["Action"]} tipo="anime" />
                 <CardSection nomeSecao="Animes de Aventura" fetchFunction={buscarAnimesPorGenero} fetchParams={["Adventure"]} tipo="anime" />
                 <CardSection nomeSecao="Animes de Comédia" fetchFunction={buscarAnimesPorGenero} fetchParams={["Comedy"]} tipo="anime" />
@@ -36,7 +33,7 @@ const Animes = () => {
                 <CardSection nomeSecao="Animes de Suspense" fetchFunction={buscarAnimesPorGenero} fetchParams={["Thriller"]} tipo="anime" />
             </main>
 
-            {/* Navegação inferior (mobile) */}
+            {/* Rodapé e navegação inferior para mobile */}
             <NavInferior />
             <Footer />
         </div>

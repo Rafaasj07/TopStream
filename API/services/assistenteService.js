@@ -1,21 +1,11 @@
-// services/assistenteService.js
 import axios from 'axios';
 
-// A chave da API é carregada das variáveis de ambiente para segurança.
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
-/**
- * Analisa a descrição em linguagem natural de um usuário e a converte
- * em um objeto estruturado para busca em API.
- * @param {string} descricao - A descrição do que o usuário quer assistir.
- * @returns {Promise<{tipo: 'filme' | 'serie' | 'anime', termo_busca: string}>}
- */
+// Analisa a descrição do usuário via IA e retorna um objeto com tipo e termo de busca
 export async function analisarDescricaoParaBusca(descricao) {
-  // Monta a estrutura de mensagens para enviar à IA.
   const messages = [
     {
-      // A mensagem "system" define o comportamento e as regras da IA.
-      // É a instrução principal que guia a resposta.
       role: 'system',
       content: `
 Você é um assistente especialista em interpretar pedidos de filmes, séries e animes. Sua única função é converter a frase de um usuário em um objeto JSON para uma busca de API.
@@ -43,37 +33,35 @@ Regras:
       `.trim(),
     },
     {
-      // A mensagem "user" contém a descrição real enviada pelo usuário.
       role: 'user',
       content: `Analise esta descrição: "${descricao}"`,
     },
   ];
 
   try {
-    // Envia a requisição para a API do OpenRouter com as instruções e a descrição.
+    // Envia o prompt para a API do OpenRouter processar a intenção
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
-        model: 'deepseek/deepseek-r1:free', // Modelo de IA a ser usado.
+        model: 'mistralai/mistral-7b-instruct:free',
         messages,
-        response_format: { type: 'json_object' }, // Força a resposta a ser um objeto JSON.
+        response_format: { type: 'json_object' },
       },
       {
         headers: {
           Authorization: `Bearer ${OPENROUTER_API_KEY}`,
           'HTTP-Referer': process.env.FRONTEND_URL || 'http://localhost:3000',
-          'X-Title': process.env.APP_NAME || 'TopStream Finder',
+          'X-Title': process.env.APP_NAME || 'TopStream',
         },
       }
     );
 
-    // Extrai o conteúdo da resposta da IA, que é uma string no formato JSON.
     const respostaJsonString = response.data?.choices?.[0]?.message?.content;
     if (!respostaJsonString) {
       throw new Error("Resposta vazia da IA");
     }
 
-    // Converte a string JSON recebida em um objeto JavaScript real.
+    // Converte a resposta da IA de string para objeto JSON
     return JSON.parse(respostaJsonString);
 
   } catch (error) {

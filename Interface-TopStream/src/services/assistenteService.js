@@ -1,14 +1,9 @@
-// Interface-TopStream/src/services/assistenteService.js
 import api from './api';
 
-/**
- * Envia uma descrição para o assistente da API e recebe uma sugestão.
- * Corresponde à rota: POST /assistente/sugestao
- * @param {string} descricao - A descrição do usuário.
- */
+// Envia a descrição do usuário para a API e retorna uma sugestão de conteúdo
 export const obterSugestao = async (descricao) => {
   try {
-    // Faz uma requisição POST, enviando a descrição no corpo (body)
+    // Realiza a requisição POST com a descrição no corpo
     const response = await api.post('/assistente/sugestao', { descricao });
     return response.data;
   } catch (error) {

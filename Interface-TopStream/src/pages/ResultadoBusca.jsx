@@ -4,30 +4,26 @@ import NavPadrao from "../components/NavPadrao";
 import CardSection from "../components/CardSection";
 import NavInferior from "../components/NavInferior";
 
-// Importa todas as funções de busca necessárias.
 import { pesquisarFilmes, buscarFilmesPorGenero } from "../services/filmeService";
 import { pesquisarSeries, buscarSeriesPorGenero } from "../services/serieService";
 import { pesquisarAnimes, buscarAnimesPorGenero } from "../services/animeService";
 
-// Página para exibir resultados de busca, que pode ser por termo ou gênero.
+// Exibe resultados de busca baseados em termo textual ou gênero pré-definido
 const ResultadoBusca = () => {
-    // Pega o termo de busca e o filtro da URL.
     const { query } = useParams();
     const [searchParams] = useSearchParams();
     const filter = searchParams.get('filter');
 
-    // Estados para armazenar os resultados e controlar o carregamento.
     const [filmes, setFilmes] = useState([]);
     const [series, setSeries] = useState([]);
     const [animes, setAnimes] = useState([]);
     const [carregando, setCarregando] = useState(true);
 
-    // Remove acentos e converte para minúsculas para comparar com a lista de gêneros.
+    // Normaliza string para comparação (minúsculas e sem acentos)
     const normalizarQuery = (texto) => {
         return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     };
 
-    // Efeito para buscar os resultados sempre que a query ou o filtro mudarem.
     useEffect(() => {
         const buscarResultados = async () => {
             if (!query) return;
@@ -43,7 +39,7 @@ const ResultadoBusca = () => {
 
                 let filmesResult = [], seriesResult = [], animesResult = [];
 
-                // Verifica se a busca é por um gênero pré-definido.
+                // Verifica se o termo é um gênero e busca conteúdos correspondentes por categoria
                 if (generos.has(queryNormalizada)) {
                     switch (queryNormalizada) {
                         case 'acao':
@@ -53,7 +49,6 @@ const ResultadoBusca = () => {
                                 buscarAnimesPorGenero("Action")
                             ]);
                             break;
-                        // ... outros casos de gênero ...
                         case 'drama':
                             [filmesResult, seriesResult] = await Promise.all([buscarFilmesPorGenero(18), buscarSeriesPorGenero(18)]);
                             break;
@@ -83,7 +78,7 @@ const ResultadoBusca = () => {
                             break;
                     }
                 } else {
-                    // Se não for um gênero, faz a busca por termo, respeitando o filtro.
+                    // Executa busca textual nos serviços habilitados pelo filtro
                     const promises = [];
                     if (filter === 'filmes' || !filter || filter === 'todos') {
                         promises.push(pesquisarFilmes(query));
@@ -120,7 +115,6 @@ const ResultadoBusca = () => {
         buscarResultados();
     }, [query, filter]);
 
-    // Renderiza a página com os resultados encontrados.
     return (
         <div className="bg-gray-950 min-h-screen">
             <NavPadrao />
@@ -130,12 +124,11 @@ const ResultadoBusca = () => {
                     <p className="text-gray-400 text-lg px-4">Buscando...</p>
                 ) : (
                     <>
-                        {/* Renderiza uma seção para cada tipo de conteúdo que tiver resultados. */}
+                        {/* Exibe seções apenas se houver resultados para a categoria */}
                         {filmes.length > 0 && <CardSection nomeSecao="Filmes Encontrados" dados={filmes} tipo="filme" />}
                         {series.length > 0 && <CardSection nomeSecao="Séries Encontradas" dados={series} tipo="serie" />}
                         {animes.length > 0 && <CardSection nomeSecao="Animes Encontrados" dados={animes} tipo="anime" />}
 
-                        {/* Mensagem exibida se nenhuma categoria tiver resultados. */}
                         {!carregando && !filmes.length && !series.length && !animes.length && (
                             <p className="text-gray-400 text-lg pl-3">Nenhum resultado encontrado para sua busca.</p>
                         )}

@@ -1,20 +1,12 @@
-// TopStream - Copia/API/services/tmdbService.js
-
-// Importa o axios para fazer requisições HTTP
 import axios from 'axios';
-// Importa funções para trabalhar com cache local de dados
 import { get, set } from './cacheService.js';
 
-// Define a URL base da API TMDB e usa a chave da API (armazenada em variável de ambiente)
 const BASE_URL_TMDB = 'https://api.themoviedb.org/3';
 const CHAVE_API_TMDB = process.env.TMDB_API_KEY;
 
-// IDs de gêneros que devem ser ignorados nas buscas (por exemplo: romance)
 const GENEROS_EXCLUIDOS = [10749];
 
-// Palavras-chave para filtrar conteúdos inadequados
 const PALAVRAS_PROIBIDAS = [
-  // Português
   'hentai', 'adulto', '+18', '18+', 'xxx', 'erótico', 'erotico', 'pornô', 'porno', 'porn',
   'sexual', 'sexo', 'nude', 'nudes', 'nudez', 'sensual', 'sedutor', 'sedução', 'orgasmo',
   'fetiche', 'bdsm', 'yaoi', 'yuri', 'ecchi', 'nsfw', 'tentáculo', 'incesto', 'pedofilia',
@@ -25,7 +17,6 @@ const PALAVRAS_PROIBIDAS = [
   'peitos', 'seios', 'bundas', 'nádegas', 'genitália', 'vagina', 'pênis', 'boquete',
   'chupar', 'gozar', 'gozo', 'ejacular', 'ejaculação', 'penetração', 'beijo técnico',
 
-  // Inglês
   'hentai', 'adult', '18+', 'xxx', 'pussy', 'erotic', 'porn', 'sexual', 'sex', 'nude', 'nudes',
   'sensual', 'seductive', 'orgasm', 'fetish', 'bdsm', 'yaoi', 'yuri', 'ecchi', 'nsfw',
   'tentacle', 'incest', 'pedophilia', 'abuse', 'explicit', 'vulgar', 'lewd', 'obscene',
@@ -36,7 +27,7 @@ const PALAVRAS_PROIBIDAS = [
   'technical kiss'
 ];
 
-// Função que normaliza texto: tira acentos e coloca tudo em minúsculas
+// Remove acentos e converte texto para minúsculas
 function normalizarTexto(texto) {
   return (texto || '')
     .normalize("NFD")
@@ -44,7 +35,7 @@ function normalizarTexto(texto) {
     .toLowerCase();
 }
 
-// Função genérica para fazer chamadas à API TMDB com parâmetros personalizados
+// Realiza requisições GET genéricas para a API do TMDB
 async function buscarNaTMDB(endpoint, parametros = {}) {
   try {
     const resposta = await axios.get(`${BASE_URL_TMDB}${endpoint}`, {
@@ -62,7 +53,7 @@ async function buscarNaTMDB(endpoint, parametros = {}) {
   }
 }
 
-// Função para filtrar resultados (remove conteúdo sem imagem ou com palavras proibidas)
+// Filtra itens sem poster ou com palavras proibidas no título/sinopse
 const filtrarResultados = (item) => {
   const titulo = normalizarTexto(item.title || item.name);
   const sinopse = normalizarTexto(item.overview);
@@ -70,10 +61,7 @@ const filtrarResultados = (item) => {
   return item.poster_path && !proibido;
 };
 
-
-// ===================== FILMES =====================
-
-// Busca os filmes mais populares, usando cache para otimizar
+// Retorna os 10 filmes mais populares, utilizando cache
 export async function buscarTopFilmes() {
   const cacheKey = 'top-filmes';
   const cachedData = get(cacheKey);
@@ -83,6 +71,7 @@ export async function buscarTopFilmes() {
   }
 
   console.log(`[API] Buscando '${cacheKey}' na TMDB.`);
+  // Busca na API, filtra resultados e salva no cache
   const dados = await buscarNaTMDB('/discover/movie', {
     sort_by: 'popularity.desc',
     without_genres: GENEROS_EXCLUIDOS.join(','),
@@ -93,7 +82,7 @@ export async function buscarTopFilmes() {
   return resultados;
 }
 
-// Busca filmes de um gênero específico
+// Busca filmes por gênero, utilizando cache
 export async function buscarFilmesPorGenero(idGenero) {
   if (GENEROS_EXCLUIDOS.includes(Number(idGenero))) return [];
 
@@ -105,6 +94,7 @@ export async function buscarFilmesPorGenero(idGenero) {
   }
 
   console.log(`[API] Buscando '${cacheKey}' na TMDB.`);
+  // Busca na API e filtra resultados
   const dados = await buscarNaTMDB('/discover/movie', {
     with_genres: idGenero,
     sort_by: 'popularity.desc',
@@ -115,13 +105,13 @@ export async function buscarFilmesPorGenero(idGenero) {
   return resultados;
 }
 
-// Busca filmes pelo título
+// Pesquisa filmes pelo título na API
 export async function buscarFilmesPorTitulo(tituloBusca) {
   const dados = await buscarNaTMDB('/search/movie', { query: tituloBusca });
   return dados.results.filter(filtrarResultados);
 }
 
-// Busca detalhes de um filme, incluindo trailer (se houver)
+// Obtém detalhes e trailer (YouTube) de um filme
 export async function buscarDetalhesFilme(idFilme) {
   const [detalhes, videos] = await Promise.all([
     buscarNaTMDB(`/movie/${idFilme}`),
@@ -134,10 +124,7 @@ export async function buscarDetalhesFilme(idFilme) {
   return detalhes;
 }
 
-
-// ===================== SÉRIES =====================
-
-// Busca as séries mais populares
+// Retorna as 10 séries mais populares, utilizando cache
 export async function buscarTopSeries() {
   const cacheKey = 'top-series';
   const cachedData = get(cacheKey);
@@ -147,6 +134,7 @@ export async function buscarTopSeries() {
   }
 
   console.log(`[API] Buscando '${cacheKey}' na TMDB.`);
+  // Busca na API, filtra e salva no cache
   const dados = await buscarNaTMDB('/discover/tv', {
     sort_by: 'popularity.desc',
     without_genres: GENEROS_EXCLUIDOS.join(','),
@@ -157,7 +145,7 @@ export async function buscarTopSeries() {
   return resultados;
 }
 
-// Busca séries por gênero
+// Busca séries por gênero, utilizando cache
 export async function buscarSeriesPorGenero(idGenero) {
   if (GENEROS_EXCLUIDOS.includes(Number(idGenero))) return [];
 
@@ -169,6 +157,7 @@ export async function buscarSeriesPorGenero(idGenero) {
   }
 
   console.log(`[API] Buscando '${cacheKey}' na TMDB.`);
+  // Busca na API e filtra resultados
   const dados = await buscarNaTMDB('/discover/tv', {
     with_genres: idGenero,
     sort_by: 'popularity.desc',
@@ -179,13 +168,13 @@ export async function buscarSeriesPorGenero(idGenero) {
   return resultados;
 }
 
-// Busca séries pelo nome
+// Pesquisa séries pelo título na API
 export async function buscarSeriesPorTitulo(tituloBusca) {
   const dados = await buscarNaTMDB('/search/tv', { query: tituloBusca });
   return dados.results.filter(filtrarResultados);
 }
 
-// Busca detalhes de uma série, incluindo trailer
+// Obtém detalhes e trailer (YouTube) de uma série
 export async function buscarDetalhesSerie(idSerie) {
   const [detalhes, videos] = await Promise.all([
     buscarNaTMDB(`/tv/${idSerie}`),

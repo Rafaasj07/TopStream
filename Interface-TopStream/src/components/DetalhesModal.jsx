@@ -1,31 +1,24 @@
-// Importa os hooks React e funções de busca de dados.
 import { useState, useEffect } from 'react';
 import { buscarDetalhesFilme } from '../services/filmeService';
 import { buscarDetalhesSerie } from '../services/serieService';
 import { buscarDetalhesAnime } from '../services/animeService';
 import { adicionarFavorito, removerFavorito, isFavorito } from '../services/favoritosService';
 
-// Componente do modal que exibe detalhes de um filme, série ou anime.
+// Modal que exibe detalhes da mídia e gerencia estado de favorito
 const DetalhesModal = ({ item, tipo, onClose }) => {
-    // Estado para armazenar os detalhes da mídia
     const [detalhes, setDetalhes] = useState(null);
-    // Estado de carregamento para controle visual
     const [carregando, setCarregando] = useState(true);
-    // Estado que controla se o item atual é favorito
     const [favorito, setFavorito] = useState(false);
-    
-    // Hook que é executado sempre que o item ou tipo mudar
+
     useEffect(() => {
-        // Atualiza o status de favorito assim que o modal abre
         setFavorito(isFavorito(item.id));
 
-        // Busca os detalhes da mídia (filme, série ou anime)
+        // Busca os detalhes completos dependendo do tipo de mídia (filme, série ou anime)
         const fetchDetalhes = async () => {
             if (!item) return;
             try {
                 setCarregando(true);
                 let resultado;
-                // Escolhe o serviço adequado baseado no tipo
                 if (tipo === 'filme') {
                     resultado = await buscarDetalhesFilme(item.id);
                 } else if (tipo === 'serie') {
@@ -33,56 +26,52 @@ const DetalhesModal = ({ item, tipo, onClose }) => {
                 } else if (tipo === 'anime') {
                     resultado = await buscarDetalhesAnime(item.id);
                 }
-                setDetalhes(resultado); // Atualiza os detalhes na UI
+                setDetalhes(resultado);
             } catch (error) {
                 console.error("Erro ao buscar detalhes:", error);
             } finally {
-                setCarregando(false); // Finaliza o carregamento
+                setCarregando(false);
             }
         };
 
-        fetchDetalhes(); // Executa a função assíncrona
+        fetchDetalhes();
     }, [item, tipo]);
 
-    // Alterna entre adicionar ou remover dos favoritos
+    // Alterna adição/remoção dos favoritos e atualiza estado visual
     const handleToggleFavorito = () => {
         if (favorito) {
             removerFavorito(item.id);
         } else {
-            adicionarFavorito(item, tipo); // Salva o tipo para uso posterior
+            adicionarFavorito(item, tipo);
         }
-        setFavorito(!favorito); // Atualiza a estrela
+        setFavorito(!favorito);
     };
 
-    // Constrói a URL da imagem corretamente, tratando casos de link completo (AniList)
+    // Trata URL da imagem para garantir formato correto com domínio do TMDB
     const getImagemUrl = (path) => {
         if (!path) return null;
         if (path.startsWith('http')) return path;
         return `https://image.tmdb.org/t/p/w500${path}`;
     };
 
-    // Fecha o modal ao clicar fora do conteúdo principal
+    // Fecha o modal apenas se o clique for no overlay (fundo escuro)
     const handleOutsideClick = (e) => {
         if (e.target === e.currentTarget) {
             onClose();
         }
     };
 
-    // Se não houver item selecionado, não renderiza nada
     if (!item) return null;
 
     return (
-        // Fundo escuro fixo cobrindo a tela
         <div
             className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4"
-            onClick={handleOutsideClick} // Fecha ao clicar fora
+            onClick={handleOutsideClick}
         >
-            {/* Modal em si */}
             <div
                 className="bg-gray-900 rounded-lg shadow-2xl max-w-lg w-full relative transform transition-all animate-fade-in-up"
-                onClick={(e) => e.stopPropagation()} // Impede que o clique dentro feche o modal
+                onClick={(e) => e.stopPropagation()}
             >
-                {/* Botão de fechar (canto superior direito) */}
                 <button
                     className="absolute top-3 right-3 text-white bg-black bg-opacity-50 rounded-full w-8 h-8 flex items-center justify-center hover:bg-opacity-75 z-30"
                     onClick={onClose}
@@ -91,16 +80,13 @@ const DetalhesModal = ({ item, tipo, onClose }) => {
                 </button>
 
                 {carregando ? (
-                    // Enquanto carrega, mostra texto
                     <div className="h-96 flex justify-center items-center">
                         <p className="text-white">Carregando detalhes...</p>
                     </div>
                 ) : (
                     <>
-                        {/* VÍDEO ou IMAGEM DE DESTAQUE */}
                         <div className="h-56 sm:h-64 bg-black rounded-t-lg">
                             {detalhes?.trailer_key ? (
-                                // Se houver trailer, mostra iframe do YouTube
                                 <iframe
                                     width="100%"
                                     height="100%"
@@ -111,7 +97,6 @@ const DetalhesModal = ({ item, tipo, onClose }) => {
                                     className="rounded-t-lg"
                                 ></iframe>
                             ) : (
-                                // Se não houver trailer, mostra imagem
                                 <img
                                     src={getImagemUrl(detalhes?.backdrop_path || detalhes?.poster_path)}
                                     alt={detalhes?.title || detalhes?.name}
@@ -120,13 +105,11 @@ const DetalhesModal = ({ item, tipo, onClose }) => {
                             )}
                         </div>
 
-                        {/* TEXTO E INFORMAÇÕES */}
                         <div className="p-6">
                             <div className="flex justify-between items-start gap-4">
                                 <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
                                     {detalhes?.title || detalhes?.name}
                                 </h2>
-                                {/* Botão de Favorito */}
                                 <button
                                     onClick={handleToggleFavorito}
                                     className={`flex-shrink-0 text-3xl transition-all duration-200 transform hover:scale-110 ${
@@ -138,7 +121,6 @@ const DetalhesModal = ({ item, tipo, onClose }) => {
                                 </button>
                             </div>
 
-                            {/* Informações secundárias: ano, gêneros, nota */}
                             <div className="flex flex-wrap items-center text-gray-400 text-sm mb-4 gap-x-3 gap-y-1">
                                 {(detalhes?.release_date || detalhes?.first_air_date) && (
                                     <span>
@@ -162,7 +144,6 @@ const DetalhesModal = ({ item, tipo, onClose }) => {
                                 )}
                             </div>
 
-                            {/* Descrição/sinopse */}
                             <p className="text-gray-300 text-sm leading-relaxed max-h-40 overflow-y-auto scroll-invisivel">
                                 {detalhes?.overview || detalhes?.description || 'Sem sinopse disponível.'}
                             </p>
